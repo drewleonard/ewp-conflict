@@ -18,6 +18,8 @@ d3.queue()
         if (error) {
             throw error
         } else {
-            console.log(conflicts)
+
+
+
         }
     })
