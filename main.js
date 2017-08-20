@@ -2,6 +2,20 @@
 // TODO //
 //////////
 
+////////////////
+// DIMENSIONS //
+////////////////
+
+var w = parseInt($('.chart-main').css('width')),
+    h = parseInt($('.chart-main').css('height'));
+
+//////////////////
+// CREATING SVG //
+//////////////////
+
+
+
+
 /////////////////
 // NAMING DATA //
 /////////////////
