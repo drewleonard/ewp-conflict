@@ -2,6 +2,14 @@
 // TODO //
 //////////
 
+// Add data to excel file (i.e., name of event, countries involved, factions, aftermath, type of war, region)
+
+/////////////////////
+// INTIAL SETTINGS //
+/////////////////////
+
+var mainDuration = 1000;
+
 //////////////////
 // CREATING SVG //
 //////////////////
@@ -9,16 +17,12 @@
 var mainChart = d3.select('.chart-main')
     .append('svg')
     .attr('id', 'mainChart');
-// .attr('width', w)
-// .attr('height', h)
-// .append('g')
-// .attr('id', 'mainChartG');
 
-////////////////
-// INITIALIZE //
-////////////////
+//////////////////////////////
+// PRIMARY DRAWING FUNCTION //
+//////////////////////////////
 
-function drawMainChart(conflicts) {
+function drawPrimaryChart(conflicts) {
 
     ////////////////
     // DIMENSIONS //
@@ -46,6 +50,26 @@ function drawMainChart(conflicts) {
         .range([20, h])
         .domain([0, conflicts.length]);
 
+    //////////
+    // AXIS //
+    //////////
+
+    d3.selectAll('.axis')
+        .remove();
+
+    var xAxis = d3.axisBottom()
+        .scale(xScale)
+        .tickSize(h - 25)
+        .tickFormat(d3.format(''));
+
+    mainChart.append('g')
+        .attr('class', 'axis')
+        .attr('transform', 'translate(0,25)')
+        .call(xAxis);
+
+    d3.select('.axis').selectAll('text')
+        .attr("transform", "translate( 0, " + -h + ") ");
+
     ///////////////////////////
     // ADDING EVENT ELEMENTS //
     ///////////////////////////
@@ -56,36 +80,87 @@ function drawMainChart(conflicts) {
         .append('rect')
         .attr('class', 'event') // add class to style
         .attr('x', function(d) { return xScale(d.STARTYEAR); })
-        .attr('y', function(d, i) { return yScale(i); })
+        .attr('y', function(d, i) {
+            console.log(yScale(i));
+            return yScale(i);
+        })
         .attr('width', function(d) { return xScale(d.ENDYEAR) - xScale(d.STARTYEAR); })
-        .attr('height', (h / conflicts.length) * 0.90);
-
-    //////////
-    // AXIS //
-    //////////
-
-    d3.selectAll('.axis')
-        .remove();
-
-    var xAxis = d3.axisBottom()
-        .scale(xScale)
-        .ticks(10)
-        .tickSize(h - 25)
-        .tickFormat(d3.format(''));
-
-    mainChart.append('g')
-        .attr('class', 'axis')
-        .attr('transform', 'translate(0,25)')
-        .call(xAxis);
-
-    var labelPos = -h
-
-    d3.select('.axis').selectAll('text')
-        .attr("transform", "translate( 0, " + labelPos + ") ")
-
-
-
+        .attr('height', (h / conflicts.length) * 0.80);
 }
+
+////////////////////////
+// ORDERING FUNCTIONS //
+////////////////////////
+
+function orderByDeath(conflicts) {
+
+    ////////////////
+    // DIMENSIONS //
+    ////////////////
+
+    var w = parseInt($('.chart-main').css('width')),
+        h = parseInt($('.chart-main').css('height'));
+
+    ///////////
+    // SCALE //
+    ///////////
+
+    var yScale = d3.scaleLinear()
+        .range([20, h])
+        .domain([0, conflicts.length])
+
+    ////////////////
+    // TRANSITION //
+    ////////////////
+
+    mainChart.selectAll('.event')
+        .sort(function(a, b) {
+            return d3.ascending(+a.AVGFAT, +b.AVGFAT);
+        })
+        .transition()
+        .duration(1000)
+        .attr('y', function(d, i) {
+            return yScale(i);
+        });
+}
+
+function orderByData(conflicts) {
+
+    ////////////////
+    // DIMENSIONS //
+    ////////////////
+
+    var w = parseInt($('.chart-main').css('width')),
+        h = parseInt($('.chart-main').css('height'));
+
+    ///////////
+    // SCALE //
+    ///////////
+
+    var yScale = d3.scaleLinear()
+        .range([20, h])
+        .domain([0, conflicts.length])
+
+    ////////////////
+    // TRANSITION //
+    ////////////////
+
+    mainChart.selectAll('.event')
+        .sort(function(a, b) {
+            return d3.ascending(a.STARTYEAR, b.STARTYEAR)
+        })
+        .transition()
+        .duration(mainDuration)
+        .attr('y', function(d, i) {
+            return yScale(i);
+        });
+}
+
+////////////////////////////
+// INTERACTIVITY FUNCTION //
+////////////////////////////
+
+
 
 /////////////////
 // NAMING DATA //
@@ -115,9 +190,9 @@ d3.queue()
                 d['DURATIONYRS'] = +d['DURATIONYRS']
             });
 
-            // console.log(conflicts);
-
-            drawMainChart(conflicts);
+            drawPrimaryChart(conflicts);
+            orderByDeath(conflicts);
+            interaction(conflicts);
 
         }
     });
