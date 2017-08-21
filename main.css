@@ -63,7 +63,8 @@ body {
 
 .chart-header {
     height: 1em;
-    font-size: 0.75em;
+    font-size: 0.65em;
+    text-transform: uppercase;
     padding: 0.25em 0 0.25em 0;
 }
 
@@ -72,8 +73,8 @@ body {
 }
 
 .site-footer {
-    font-size: 0.75em;
-    height: 0.75em;
+    font-size: 0.85em;
+    height: 0.85em;
     padding: 0.25em 0.50em 0.25em 0.50em;
     background: #eee8d5;
     display: flex;
@@ -86,4 +87,23 @@ body {
     font-weight: bolder;
     display: inline-block;
     letter-spacing: .01em;
+}
+
+.axis {
+    font-size: 12px
+}
+
+.axis path,
+.axis line {
+    fill: none;
+    stroke: #838384;
+    opacity: .4;
+    stroke-dasharray: 0 10;
+    stroke-linecap: round;
+    stroke-width: 2px;
+    shape-rendering: crispEdges
+}
+
+.axis path {
+    stroke: none
 }
