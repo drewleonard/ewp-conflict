@@ -53,7 +53,7 @@ body {
 }
 
 .site-content-left {
-    width: 300px;
+    width: 400px;
 }
 
 .site-content-right {
@@ -99,7 +99,6 @@ body {
     display: none
 }
 
-
 .chart-bold {
     font-weight: bolder;
     /* margin-right: 10px; */
@@ -112,7 +111,7 @@ body {
 .site-footer {
     font-size: 0.85em;
     height: 0.85em;
-    padding: 0.50em 0.50em 0.50em 0.50em;
+    padding: 0.50em 0.50em 0.85em .50em;
     background: #eee8d5;
     display: flex;
     align-items: center;
@@ -127,6 +126,15 @@ body {
     letter-spacing: .01em;
 }
 
+.footer-title-main a {
+    color: inherit;
+    text-decoration: inherit;
+}
+
+.footer-title-main a:hover {
+    color: #268bd2;
+}
+
 .footer-title-sub {
     color: var(--footer-font-color);
     text-transform: uppercase;
@@ -137,6 +145,7 @@ body {
 
 .event {
     fill: #586e75;
+    cursor: pointer;
 }
 
 .event-over {
@@ -160,4 +169,8 @@ body {
 
 .axis path {
     stroke: none
+}
+
+.axis text {
+    fill: #93a1a1;
 }

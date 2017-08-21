@@ -105,7 +105,7 @@ function orderByDeath() {
     // SCALE //
     ///////////
 
-    // WARNING: 131 IS HARD CODED --- CHANGE!
+    // WARNING: 131 IS HARD CODED!
     var yScale = d3.scaleLinear()
         .range([20, h])
         .domain([0, 131])
@@ -138,7 +138,7 @@ function orderByDate() {
     // SCALE //
     ///////////
 
-    // WARNING: 131 IS HARD CODED --- CHANGE!
+    // WARNING: 131 IS HARD CODED!
     var yScale = d3.scaleLinear()
         .range([20, h])
         .domain([0, 131])
