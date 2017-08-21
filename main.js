@@ -92,7 +92,7 @@ function drawPrimaryChart(conflicts) {
 // ORDERING FUNCTIONS //
 ////////////////////////
 
-function orderByDeath(conflicts) {
+function orderByDeath() {
 
     ////////////////
     // DIMENSIONS //
@@ -105,9 +105,10 @@ function orderByDeath(conflicts) {
     // SCALE //
     ///////////
 
+    // WARNING: 131 IS HARD CODED --- CHANGE!
     var yScale = d3.scaleLinear()
         .range([20, h])
-        .domain([0, conflicts.length])
+        .domain([0, 131])
 
     ////////////////
     // TRANSITION //
@@ -124,7 +125,7 @@ function orderByDeath(conflicts) {
         });
 }
 
-function orderByData(conflicts) {
+function orderByDate() {
 
     ////////////////
     // DIMENSIONS //
@@ -137,9 +138,10 @@ function orderByData(conflicts) {
     // SCALE //
     ///////////
 
+    // WARNING: 131 IS HARD CODED --- CHANGE!
     var yScale = d3.scaleLinear()
         .range([20, h])
-        .domain([0, conflicts.length])
+        .domain([0, 131])
 
     ////////////////
     // TRANSITION //
@@ -160,7 +162,41 @@ function orderByData(conflicts) {
 // INTERACTIVITY FUNCTION //
 ////////////////////////////
 
+function interaction(conflicts) {
 
+    ///////////////
+    // MOUSEOVER //
+    ///////////////
+
+    d3.selectAll('.event')
+        .on('mouseover', function() {
+            d3.select(this)
+                .classed('event-over', true)
+        });
+
+    //////////////
+    // MOUSEOUT //
+    //////////////
+
+    d3.selectAll('.event')
+        .on('mouseout', function() {
+            d3.select(this)
+                .classed('event-over', false)
+        });
+
+    //////////////////
+    // RADIO BUTTON //
+    //////////////////
+    d3.selectAll('.radiobutton').on('click', function() {
+
+        d3.select(this.parentNode).selectAll('.radiobutton')
+            .classed('label-selected', false)
+
+        d3.select(this)
+            .classed('label-selected', true)
+
+    })
+}
 
 /////////////////
 // NAMING DATA //
@@ -191,7 +227,7 @@ d3.queue()
             });
 
             drawPrimaryChart(conflicts);
-            orderByDeath(conflicts);
+            orderByDeath();
             interaction(conflicts);
 
         }

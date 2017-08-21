@@ -63,11 +63,46 @@ body {
     padding: 0.25em 0.50em 0.25em 0.50em;
 }
 
-.chart-header {
+.chart-button {
+    display: flex;
+    flex-direction: row;
     height: 1em;
     font-size: 0.65em;
     text-transform: uppercase;
     padding: 0.25em 0 1.0em 0;
+}
+
+.chart-button label {
+    text-transform: uppercase;
+    cursor: pointer;
+    padding: 0 5px;
+    /* line-height: 11px; */
+}
+
+.chart-button label:first-of-type {
+    border-right: solid 1px #586e75;
+}
+
+.chart-button label:last-of-type {
+    padding-left: 0
+}
+
+.label-selected {
+    color: #268bd2;
+}
+
+.chart-button input[type="radio"] {
+    display: none
+}
+
+.chart-button input[type="checkbox"] {
+    display: none
+}
+
+
+.chart-bold {
+    font-weight: bolder;
+    /* margin-right: 10px; */
 }
 
 .chart-main {
@@ -102,6 +137,10 @@ body {
 
 .event {
     fill: #586e75;
+}
+
+.event-over {
+    fill: #268bd2;
 }
 
 .axis {

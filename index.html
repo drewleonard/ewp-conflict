@@ -18,12 +18,23 @@
         <main class="site-content">
             <div class="site-content-left"></div>
             <div class="site-content-right">
-                <div class="chart-header"><strong>Order by:</strong> Chronological | Casualties</div>
+                <div class="chart-button">
+                    <div class="chart-bold">Order by:</div>
+                    <form>
+                        <label class="radiobutton label-selected">
+                            <input type="radio" name="thefields" onclick="orderByDeath()" checked="checked">number of deaths</label>
+                        <label class="radiobutton">
+                            <input type="radio" name="thefields" onclick="orderByDate()">Chronological order</label>
+                    </form>
+                </div>
                 <div class="chart-main"></div>
             </div>
         </main>
         <footer class="site-footer">
             <div class="footer-title-main">About this project</div>
+            <!-- <a class="footer-title-github">
+    <use xlink:href=#Octicons-mark-github.svg></use>
+</a> -->
             <div class="footer-title-sub">Created by Drew Leonard</div>
         </footer>
     </div>
