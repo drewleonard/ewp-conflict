@@ -3,7 +3,7 @@
     --primary-font: 'Fira Sans', sans-serif;
     --primary-font-size: 20px;
     --primary-font-color: #586e75;
-    --header-font-color: #268bd2;
+    --secondary-font-color: #268bd2;
     --footer-font-color: #93a1a1;
 }
 
@@ -38,7 +38,7 @@ body {
 }
 
 .header-title-main {
-    color: var(--header-font-color);
+    color: var(--secondary-font-color);
     text-transform: uppercase;
     font-weight: bolder;
     display: inline-block;
@@ -70,7 +70,9 @@ body {
 
 .country {
     fill: #93a1a1;
-    padding: 0.25em 0 0 022222;
+    padding: 0.25em 0 0 0;
+    stroke: 1px;
+    stroke-opacity: 0;
 }
 
 .country-over {
@@ -194,4 +196,32 @@ body {
 
 .axis text {
     fill: #93a1a1;
+}
+
+.tooltip {
+    position: absolute;
+    background-color: var(--primary-color);
+    display: none;
+    border: 3px solid var(--primary-font-color);
+    padding: 5px;
+    color: var(--primary-font-color);
+}
+
+.tooltipTextPrimary {
+    color: var(--secondary-font-color);
+    font-weight: 700;
+    margin: 0;
+    padding: 0;
+}
+
+.tooltipTextSecondary {
+    margin: 0;
+    padding: 0;
+    font-size: 0.75em;
+}
+
+.tooltipTextTertiary {
+    margin: 0;
+    padding: 0;
+    font-size: 0.90em;
 }

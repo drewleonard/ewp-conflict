@@ -37,9 +37,11 @@ var mainDuration = 1000;
 
 var mapW, mapH, mapG, path, projection;
 
-//////////////////
-// CREATING SVG //
-//////////////////
+var formatComma = d3.format(',');
+
+///////////////////
+// PAGE ELEMENTS //
+///////////////////
 
 var mainChart = d3.select('.chart-main')
     .append('svg')
@@ -48,6 +50,8 @@ var mainChart = d3.select('.chart-main')
 var map = d3.select('.map')
     .append('svg')
     .attr('id', 'map');
+
+var tooltip = d3.select('.tooltip');
 
 //////////////////////////////
 // PRIMARY DRAWING FUNCTION //
@@ -236,7 +240,6 @@ function drawMap(countries) {
 
 function center(id) {
 
-    // console.log(id)
     d3.select(id)
         .call(function(d) {
 
@@ -255,50 +258,81 @@ function center(id) {
         })
 }
 
-////////////////////////////
-// INTERACTIVITY FUNCTION //
-////////////////////////////
+/////////////////////////////
+// INTERACTIVITY FUNCTIONS //
+/////////////////////////////
+
+function eventMouseOver(d) {
+
+    // color bar
+    d3.select(this)
+        .classed('event-over', true)
+
+    /////////////
+    // TOOLTIP //
+    /////////////
+
+    // prepare text
+    var pCountry = '<p class="tooltipTextPrimary">' + d.COUNTRY + '</p>',
+        pDates = '<p class="tooltipTextSecondary">' + d.STARTYEAR + " - " + d.ENDYEAR + '</p>',
+        pCasualties = '<p class="tooltipTextTertiary">' + formatComma(d.AVGFAT) + " casualties" + '</p>';
+
+    // record and set locations
+    var top = this.getBoundingClientRect().y,
+        left = this.getBoundingClientRect().x + (this.getBoundingClientRect().width / 4);
+
+    // add tooltip
+    tooltip
+        .style("display", "inline-block")
+        .html(pCountry + pDates + pCasualties);
+}
+
+function eventMouseMove(d) {
+
+    tooltip
+        .style('top', function() {
+            return d3.event.pageY - ($(this).height() * (3 / 2)) + "px";
+        })
+        .style('left', function() {
+            return d3.event.pageX + "px";
+        });
+}
+
+function eventMouseOut(d) {
+
+    // remove bar color
+    d3.select(this)
+        .classed('event-over', false)
+
+    tooltip
+        .style('display', 'none')
+}
+
+function eventClick(d) {
+
+    var id = '#' + d.COUNTRY;
+
+    d3.selectAll('.country')
+        .classed('country-over', false)
+
+    d3.select(id)
+        .classed('country-over', true);
+
+    center(id);
+
+}
 
 function interaction(conflicts) {
 
-    ///////////////
-    // MOUSEOVER //
-    ///////////////
+    //////////////////
+    // MOUSE EVENTS //
+    //////////////////
 
     d3.selectAll('.event')
-        .on('mouseover', function(d) {
-            d3.select(this)
-                .classed('event-over', true)
-        });
-
-    //////////////
-    // MOUSEOUT //
-    //////////////
-
-    d3.selectAll('.event')
-        .on('mouseout', function() {
-            d3.select(this)
-                .classed('event-over', false)
-        });
-
-    ///////////
-    // CLICK //
-    ///////////
-
-    d3.selectAll('.event')
-        .on('click', function(d) {
-
-            var id = '#' + d.COUNTRY;
-
-            d3.selectAll('.country')
-                .classed('country-over', false)
-
-            d3.select(id)
-                .classed('country-over', true);
-
-            center(id);
-
-        })
+        .on('mouseover', eventMouseOver)
+        .on('mousemove', eventMouseMove)
+        .on('mouseout', eventMouseOut)
+        .on('click', eventClick);
 
     //////////////////
     // RADIO BUTTON //
