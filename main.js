@@ -2,28 +2,40 @@
 // TODO //
 //////////
 
+// TODAY
+// -- forward functionality (i.e., bar clicking behavior)
+// -- reverse functionality (i.e., using map to filter, etc.)
+// -- Add regions to each area dynamically
+// -- Match countries / check which ones don't work
 // Add data to excel file (i.e., name of event, countries involved, factions, aftermath, type of war, region)
 // Color chart radio buttons on hover
 // MAP
 // -- fix box padding / position
+// -- add automatic scaling
 // TOOLTIP
 // -- Event name
 // -- Number of casualties
 // -- Years
 // SIDE BAR ON LEFT
-// -- Title / general information
+// -- Title
+// -- Region
 // -- SPECIFIC INFORMATION
 // -- -- Factions
 // -- -- Deaths
 // -- -- Aftermath
 // Legend for order of bars
 // Change radio button hard coding
+// Resizing function
+// Merging functionality (d3.v4)
+// functionality when country does not exist?
 
 /////////////////////
 // INTIAL SETTINGS //
 /////////////////////
 
 var mainDuration = 1000;
+
+var mapW, mapH, mapG, path, projection;
 
 //////////////////
 // CREATING SVG //
@@ -176,6 +188,73 @@ function orderByDate() {
         });
 }
 
+//////////////////////////
+// MAP DRAWING FUNCTION //
+//////////////////////////
+
+function drawMap(countries) {
+
+    ////////////////
+    // DIMENSIONS //
+    ////////////////
+
+    mapW = parseInt($('.map').css('width'));
+    mapH = parseInt($('.map').css('height'));
+
+    map
+        .attr('width', mapW)
+        .attr('height', mapH);
+
+    mapG = map.append('g');
+
+    ////////////
+    // SCALES //
+    ////////////
+
+    projection = d3.geoMercator()
+        .scale(mapW / 2 / Math.PI)
+        .translate([mapW / 2, mapH / 2]);
+
+    path = d3.geoPath().projection(projection);
+
+    /////////////////
+    // DRAWING MAP //
+    /////////////////
+
+    mapG.selectAll(".country")
+        .data(countries)
+        .enter()
+        .insert("path", ".graticule")
+        .attr("class", "country")
+        .attr("id", function(d) { return d.name; })
+        .attr("d", path);
+}
+
+////////////////////////
+// CENTERING FUNCTION //
+////////////////////////
+
+function center(id) {
+
+    // console.log(id)
+    d3.select(id)
+        .call(function(d) {
+
+            var bounds = path.bounds(d.datum()),
+                dx = bounds[1][0] - bounds[0][0],
+                dy = bounds[1][1] - bounds[0][1],
+                x = (bounds[0][0] + bounds[1][0]) / 2,
+                y = (bounds[0][1] + bounds[1][1]) / 2,
+                scale = Math.max(1, Math.min(8, 0.9 / Math.max(dx / mapW, dy / mapH))),
+                translate = [mapW / 2 - scale * x, mapH / 2 - scale * y];
+
+            mapG.transition()
+                .duration(750)
+                .attr("transform", "translate(" + translate + ")scale(" + scale + ")");
+
+        })
+}
+
 ////////////////////////////
 // INTERACTIVITY FUNCTION //
 ////////////////////////////
@@ -187,7 +266,7 @@ function interaction(conflicts) {
     ///////////////
 
     d3.selectAll('.event')
-        .on('mouseover', function() {
+        .on('mouseover', function(d) {
             d3.select(this)
                 .classed('event-over', true)
         });
@@ -202,9 +281,29 @@ function interaction(conflicts) {
                 .classed('event-over', false)
         });
 
+    ///////////
+    // CLICK //
+    ///////////
+
+    d3.selectAll('.event')
+        .on('click', function(d) {
+
+            var id = '#' + d.COUNTRY;
+
+            d3.selectAll('.country')
+                .classed('country-over', false)
+
+            d3.select(id)
+                .classed('country-over', true);
+
+            center(id);
+
+        })
+
     //////////////////
     // RADIO BUTTON //
     //////////////////
+
     d3.selectAll('.radiobutton').on('click', function() {
 
         d3.select(this.parentNode).selectAll('.radiobutton')
@@ -214,46 +313,6 @@ function interaction(conflicts) {
             .classed('label-selected', true)
 
     })
-}
-
-//////////////////////////
-// MAP DRAWING FUNCTION //
-//////////////////////////
-
-function drawMap(countries) {
-
-    ////////////////
-    // DIMENSIONS //
-    ////////////////
-
-    var w = parseInt($('.map').css('width')),
-        h = parseInt($('.map').css('height'));
-
-    map
-        .attr('width', w)
-        .attr('height', h);
-
-    ////////////
-    // SCALES //
-    ////////////
-
-    var projection = d3.geoMercator()
-        .scale(400 / 2.50 / Math.PI) // 400 === width
-        .translate([400 / 2.75, 200 / 1.50]) // 200 === height
-
-    var path = d3.geoPath().projection(projection);
-
-    /////////////////
-    // DRAWING MAP //
-    /////////////////
-
-    map.selectAll(".country")
-        .data(countries)
-        .enter()
-        .insert("path", ".graticule")
-        .attr("class", "country")
-        .attr("d", path);
-
 }
 
 /////////////////
@@ -302,8 +361,8 @@ d3.queue()
 
             drawPrimaryChart(conflicts);
             orderByDeath();
-            interaction(conflicts);
             drawMap(countries);
+            interaction(conflicts);
 
         }
     });
