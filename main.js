@@ -3,6 +3,21 @@
 //////////
 
 // Add data to excel file (i.e., name of event, countries involved, factions, aftermath, type of war, region)
+// Color chart radio buttons on hover
+// MAP
+// -- fix box padding / position
+// TOOLTIP
+// -- Event name
+// -- Number of casualties
+// -- Years
+// SIDE BAR ON LEFT
+// -- Title / general information
+// -- SPECIFIC INFORMATION
+// -- -- Factions
+// -- -- Deaths
+// -- -- Aftermath
+// Legend for order of bars
+// Change radio button hard coding
 
 /////////////////////
 // INTIAL SETTINGS //
@@ -17,6 +32,10 @@ var mainDuration = 1000;
 var mainChart = d3.select('.chart-main')
     .append('svg')
     .attr('id', 'mainChart');
+
+var map = d3.select('.map')
+    .append('svg')
+    .attr('id', 'map');
 
 //////////////////////////////
 // PRIMARY DRAWING FUNCTION //
@@ -81,7 +100,6 @@ function drawPrimaryChart(conflicts) {
         .attr('class', 'event') // add class to style
         .attr('x', function(d) { return xScale(d.STARTYEAR); })
         .attr('y', function(d, i) {
-            console.log(yScale(i));
             return yScale(i);
         })
         .attr('width', function(d) { return xScale(d.ENDYEAR) - xScale(d.STARTYEAR); })
@@ -198,11 +216,53 @@ function interaction(conflicts) {
     })
 }
 
+//////////////////////////
+// MAP DRAWING FUNCTION //
+//////////////////////////
+
+function drawMap(countries) {
+
+    ////////////////
+    // DIMENSIONS //
+    ////////////////
+
+    var w = parseInt($('.map').css('width')),
+        h = parseInt($('.map').css('height'));
+
+    map
+        .attr('width', w)
+        .attr('height', h);
+
+    ////////////
+    // SCALES //
+    ////////////
+
+    var projection = d3.geoMercator()
+        .scale(400 / 2.50 / Math.PI) // 400 === width
+        .translate([400 / 2.75, 200 / 1.50]) // 200 === height
+
+    var path = d3.geoPath().projection(projection);
+
+    /////////////////
+    // DRAWING MAP //
+    /////////////////
+
+    map.selectAll(".country")
+        .data(countries)
+        .enter()
+        .insert("path", ".graticule")
+        .attr("class", "country")
+        .attr("d", path);
+
+}
+
 /////////////////
 // NAMING DATA //
 /////////////////
 
-conflicts = "ewp-conflicts-data.csv";
+var conflicts = "ewp-conflicts-data.csv",
+    topojsonMap = "https://unpkg.com/world-atlas@1/world/110m.json",
+    countryNames = "world-country-names.tsv";
 
 //////////////////
 // LOADING DATA //
@@ -210,9 +270,13 @@ conflicts = "ewp-conflicts-data.csv";
 
 d3.queue()
     .defer(d3.csv, conflicts)
-    .await(function(error, conflicts) {
+    .defer(d3.json, topojsonMap)
+    .defer(d3.tsv, countryNames)
+    .await(function(error, conflicts, world, countryNames) {
         if (error) {
+
             throw error
+
         } else {
 
             // converting strings to numbers
@@ -223,12 +287,23 @@ d3.queue()
                 d['COWCCODE'] = +d['COWCCODE'];
                 d['STARTYEAR'] = +d['STARTYEAR'];
                 d['ENDYEAR'] = +d['ENDYEAR'];
-                d['DURATIONYRS'] = +d['DURATIONYRS']
+                d['DURATIONYRS'] = +d['DURATIONYRS'];
             });
+
+            // process world map json data
+            var countries = topojson.feature(world, world.objects.countries).features;
+
+            // connect world map data to country names
+            countries = countries.filter(function(d) {
+                return countryNames.some(function(n) {
+                    if (d.id == n.id) return d.name = n.name;
+                })
+            })
 
             drawPrimaryChart(conflicts);
             orderByDeath();
             interaction(conflicts);
+            drawMap(countries);
 
         }
     });
