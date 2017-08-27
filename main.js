@@ -11,7 +11,7 @@
 // Color chart radio buttons on hover
 // MAP
 // -- fix box padding / position
-// -- add automatic scaling
+// -- add automatic scaling on intialization, but think this is fixed
 // TOOLTIP
 // -- Event name
 // -- Number of casualties
@@ -355,7 +355,7 @@ function interaction(conflicts) {
 
 var conflicts = "ewp-conflicts-data.csv",
     topojsonMap = "https://unpkg.com/world-atlas@1/world/110m.json",
-    countryNames = "world-country-names.tsv";
+    countryJson = "all.json";
 
 //////////////////
 // LOADING DATA //
@@ -364,8 +364,8 @@ var conflicts = "ewp-conflicts-data.csv",
 d3.queue()
     .defer(d3.csv, conflicts)
     .defer(d3.json, topojsonMap)
-    .defer(d3.tsv, countryNames)
-    .await(function(error, conflicts, world, countryNames) {
+    .defer(d3.json, countryJson)
+    .await(function(error, conflicts, world, countryJson) {
         if (error) {
 
             throw error
@@ -386,12 +386,16 @@ d3.queue()
             // process world map json data
             var countries = topojson.feature(world, world.objects.countries).features;
 
+            console.log(countryJson);
+
             // connect world map data to country names
             countries = countries.filter(function(d) {
-                return countryNames.some(function(n) {
-                    if (d.id == n.id) return d.name = n.name;
+                return countryJson.some(function(n) {
+                    if (d.id == n['country-code']) return d.name = n.name, d.region = n.region;
                 })
             })
+
+            console.log(countries);
 
             drawPrimaryChart(conflicts);
             orderByDeath();
