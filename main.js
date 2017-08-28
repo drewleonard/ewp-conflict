@@ -28,16 +28,20 @@
 // Resizing function
 // Merging functionality (d3.v4)
 // functionality when country does not exist?
+// height / bar number issue
 
 /////////////////////
 // INTIAL SETTINGS //
 /////////////////////
 
-var mainDuration = 1000;
+var mainDuration = 1000,
+    colorDuration = 1000 / 2;
 
 var mapW, mapH, mapG, path, projection;
 
 var formatComma = d3.format(',');
+
+var region, colorScale;
 
 ///////////////////
 // PAGE ELEMENTS //
@@ -183,13 +187,34 @@ function orderByDate() {
 
     mainChart.selectAll('.event')
         .sort(function(a, b) {
-            return d3.ascending(a.STARTYEAR, b.STARTYEAR)
+            return d3.ascending(a["STARTYEAR"], b["STARTYEAR"])
         })
         .transition()
         .duration(mainDuration)
         .attr('y', function(d, i) {
             return yScale(i);
         });
+}
+
+////////////////////////
+// COLORING FUNCTIONS //
+////////////////////////
+
+function colorByRegion() {
+
+    mainChart.selectAll('.event')
+        .transition()
+        .duration(colorDuration)
+        .style('fill', function(d) {
+            return colorScale(d.REGION);
+        })
+}
+
+function removeColor() {
+    mainChart.selectAll('.event')
+        .transition()
+        .duration(colorDuration)
+        .style('fill', null);
 }
 
 //////////////////////////
@@ -230,7 +255,10 @@ function drawMap(countries) {
         .enter()
         .insert("path", ".graticule")
         .attr("class", "country")
-        .attr("id", function(d) { return d.name; })
+        .attr("id", function(d) {
+            return '_' + parseInt(d.id);
+            // return d.name;
+        })
         .attr("d", path);
 }
 
@@ -310,7 +338,8 @@ function eventMouseOut(d) {
 
 function eventClick(d) {
 
-    var id = '#' + d.COUNTRY;
+    var id = '#_' + d.ISOCODE;
+    // var id = '#_004'
 
     d3.selectAll('.country')
         .classed('country-over', false)
@@ -354,6 +383,7 @@ function interaction(conflicts) {
 /////////////////
 
 var conflicts = "ewp-conflicts-data.csv",
+    countryCodeKey = "countryCodeKey.csv",
     topojsonMap = "https://unpkg.com/world-atlas@1/world/110m.json",
     countryJson = "all.json";
 
@@ -363,30 +393,25 @@ var conflicts = "ewp-conflicts-data.csv",
 
 d3.queue()
     .defer(d3.csv, conflicts)
+    .defer(d3.csv, countryCodeKey)
     .defer(d3.json, topojsonMap)
     .defer(d3.json, countryJson)
-    .await(function(error, conflicts, world, countryJson) {
+    .await(function(error, conflicts, countryCodeKey, world, countryJson) {
+
         if (error) {
 
             throw error
 
         } else {
 
-            // converting strings to numbers
-            conflicts.forEach(function(d) {
-                d['AVGFAT'] = +(d['AVGFAT'].replace(/,/g, ""));
-                d['CIVFATLOW'] = +(d['CIVFATLOW'].replace(/,/g, ""));
-                d['CIVFATHIGH'] = +(d['CIVFATHIGH'].replace(/,/g, ""));
-                d['COWCCODE'] = +d['COWCCODE'];
-                d['STARTYEAR'] = +d['STARTYEAR'];
-                d['ENDYEAR'] = +d['ENDYEAR'];
-                d['DURATIONYRS'] = +d['DURATIONYRS'];
-            });
+            // Data processing tasks we want to do once only
+
+            ///////////////////
+            // NON PITF DATA //
+            ///////////////////
 
             // process world map json data
             var countries = topojson.feature(world, world.objects.countries).features;
-
-            console.log(countryJson);
 
             // connect world map data to country names
             countries = countries.filter(function(d) {
@@ -395,7 +420,63 @@ d3.queue()
                 })
             })
 
-            console.log(countries);
+            // get unique region values
+            region = countries.map(function(obj) { return obj.region; });
+            region = region.filter(function(v, i) { return region.indexOf(v) == i; });
+
+            // color scale
+            colorScale = d3.scaleOrdinal()
+                .domain(region)
+                .range(["#6c71c4", "#b58900", "#dc322f", "#2aa198", "#859900"]);
+
+            //////////////////////
+            // COUNTRY CODE KEY //
+            //////////////////////
+
+            // force strings to numbers
+            countryCodeKey.forEach(function(d) {
+                d.cown = +d.cown
+                d.iso3n = +d.iso3n
+            })
+
+            ///////////////
+            // PITF DATA //
+            ///////////////
+
+            conflicts.forEach(function(d) {
+
+                // forcing strings to integers
+                d['AVGFAT'] = +(d['AVGFAT'].replace(/,/g, ""));
+                d['CIVFATLOW'] = +(d['CIVFATLOW'].replace(/,/g, ""));
+                d['CIVFATHIGH'] = +(d['CIVFATHIGH'].replace(/,/g, ""));
+                d['COWCCODE'] = +d['COWCCODE'];
+                d['STARTYEAR'] = +d['STARTYEAR'];
+                d['ENDYEAR'] = +d['ENDYEAR'];
+                d['DURATIONSYRS'] = +d['DURATIONSYRS'];
+
+                // assigning region by country
+                let country = countryJson.find(o => o.name === d['COUNTRY'])
+                if (country !== undefined) {
+                    d['REGION'] = country.region
+                }
+
+                let key = countryCodeKey.find(o => o.cown === d.COWCCODE);
+                if (key !== undefined) {
+                    d['ISOCODE'] = key.iso3n;
+                }
+
+                // finding iso3n code for conflict's country
+                // var key = countryCodeKey.find(o => o.cown === d.COWCCODE);
+                // if (key !== undefined) {
+                //     var match = countries.find(o => parseInt(o.id) === key.iso3n);
+                // }
+                // if (match !== undefined) {
+                //     d['COUNTRY'] = match.name
+                // }
+
+            });
+
+            console.log(conflicts);
 
             drawPrimaryChart(conflicts);
             orderByDeath();

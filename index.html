@@ -23,13 +23,24 @@
             </div>
             <div class="site-content-right">
                 <div class="chart-button">
-                    <div class="chart-bold">Order by:</div>
-                    <form>
-                        <label class="radiobutton label-selected">
-                            <input type="radio" name="thefields" onclick="orderByDeath()" checked="checked">number of deaths</label>
-                        <label class="radiobutton">
-                            <input type="radio" name="thefields" onclick="orderByDate()">Chronological order</label>
-                    </form>
+                    <div class="button-order">
+                        <div class="chart-bold">Order by:</div>
+                        <form>
+                            <label class="radiobutton label-selected">
+                                <input type="radio" name="thefields" onclick="orderByDeath()" checked="checked">number of deaths</label>
+                            <label class="radiobutton">
+                                <input type="radio" name="thefields" onclick="orderByDate()">Chronological order</label>
+                        </form>
+                    </div>
+                    <div class="button-color">
+                        <div class="chart-bold">Color by:</div>
+                        <form>
+                            <label class="radiobutton">
+                                <input type="radio" name="thefields" onclick="colorByRegion()">region</label>
+                            <label class="radiobutton label-selected">
+                                <input type="radio" name="thefields" onclick="removeColor()" checked="checked">none</label>
+                        </form>
+                    </div>
                 </div>
                 <div class="chart-main"></div>
             </div>
