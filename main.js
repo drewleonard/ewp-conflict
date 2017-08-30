@@ -31,9 +31,9 @@
 // height / bar number issue (think this is fixed), but check harding coding still
 //
 
-/////////////////////
-// INTIAL SETTINGS //
-/////////////////////
+//////////////////////
+// GLOBAL VARIABLES //
+//////////////////////
 
 var mainDuration = 1000,
     colorDuration = 1000 / 2;
@@ -384,7 +384,7 @@ function interaction(conflicts) {
 /////////////////
 
 var conflicts = "conflicts.csv",
-    conflicts = "ewp-conflicts-data.csv",
+    // conflicts = "ewp-conflicts-data.csv",
     countryCodeKey = "countryCodeKey.csv",
     topojsonMap = "https://unpkg.com/world-atlas@1/world/110m.json",
     countryJson = "countryIso.json";
@@ -408,19 +408,24 @@ d3.queue()
 
             // Data processing tasks we want to do once only
 
-            ///////////////////
-            // NON PITF DATA //
-            ///////////////////
+            //////////////
+            // MAP DATA //
+            //////////////
 
             // process world map json data
             var countries = topojson.feature(world, world.objects.countries).features;
 
             // connect world map data to country names
+            // this should be changed
             countries = countries.filter(function(d) {
                 return countryJson.some(function(n) {
                     if (d.id == n['country-code']) return d.name = n.name, d.region = n.region;
                 })
             })
+
+            /////////////////
+            // REGION DATA //
+            /////////////////
 
             // get unique region values
             region = countries.map(function(obj) { return obj.region; });
@@ -441,9 +446,9 @@ d3.queue()
                 d.iso3n = +d.iso3n
             })
 
-            ///////////////
-            // PITF DATA //
-            ///////////////
+            ////////////////////
+            // CONFLICTS DATA //
+            ////////////////////
 
             conflicts.forEach(function(d) {
 
@@ -454,22 +459,21 @@ d3.queue()
                 d['COWCCODE'] = +d['COWCCODE'];
                 d['STARTYEAR'] = +d['STARTYEAR'];
                 d['ENDYEAR'] = +d['ENDYEAR'];
-                d['DURATIONSYRS'] = +d['DURATIONSYRS'];
 
                 // assigning region to country
-                let country = countryJson.find(o => o.name === d['COUNTRY'])
+                let country = countryJson.find(o => o.name === d.COUNTRY)
                 if (country !== undefined) {
-                    d['REGION'] = country.region
+                    d.REGION = country.region
                 }
 
                 // assigning iso code to country
                 let key = countryCodeKey.find(o => o.cown === d.COWCCODE);
                 if (key !== undefined) {
                     d['ISOCODE'] = key.iso3n;
+                    console.log(key)
                 }
 
             });
-
 
             drawPrimaryChart(conflicts);
             orderByDeath();

@@ -1,7 +1,7 @@
 library(countrycode)
 
 # read conflict CSV
-conflict <- read.csv("ewp-conflicts-data.csv")
+conflict <- read.csv("conflicts.csv")
 
 # pull cown codes
 cown <- conflict$COWCCODE
