@@ -28,7 +28,8 @@
 // Resizing function
 // Merging functionality (d3.v4)
 // functionality when country does not exist?
-// height / bar number issue
+// height / bar number issue (think this is fixed), but check harding coding still
+//
 
 /////////////////////
 // INTIAL SETTINGS //
@@ -382,10 +383,11 @@ function interaction(conflicts) {
 // NAMING DATA //
 /////////////////
 
-var conflicts = "ewp-conflicts-data.csv",
+var conflicts = "conflicts.csv",
+    conflicts = "ewp-conflicts-data.csv",
     countryCodeKey = "countryCodeKey.csv",
     topojsonMap = "https://unpkg.com/world-atlas@1/world/110m.json",
-    countryJson = "all.json";
+    countryJson = "countryIso.json";
 
 //////////////////
 // LOADING DATA //
@@ -454,29 +456,20 @@ d3.queue()
                 d['ENDYEAR'] = +d['ENDYEAR'];
                 d['DURATIONSYRS'] = +d['DURATIONSYRS'];
 
-                // assigning region by country
+                // assigning region to country
                 let country = countryJson.find(o => o.name === d['COUNTRY'])
                 if (country !== undefined) {
                     d['REGION'] = country.region
                 }
 
+                // assigning iso code to country
                 let key = countryCodeKey.find(o => o.cown === d.COWCCODE);
                 if (key !== undefined) {
                     d['ISOCODE'] = key.iso3n;
                 }
 
-                // finding iso3n code for conflict's country
-                // var key = countryCodeKey.find(o => o.cown === d.COWCCODE);
-                // if (key !== undefined) {
-                //     var match = countries.find(o => parseInt(o.id) === key.iso3n);
-                // }
-                // if (match !== undefined) {
-                //     d['COUNTRY'] = match.name
-                // }
-
             });
 
-            console.log(conflicts);
 
             drawPrimaryChart(conflicts);
             orderByDeath();
