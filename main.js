@@ -294,13 +294,6 @@ function eventHighlight(id) {
         });
 }
 
-function removeHighlight() {
-    // d3.selectAll('.event')
-    //     .transition()
-    //     .duration(secondaryDuration)
-    //     .style('opacity', 1)
-}
-
 /////////////////////////////
 // INTERACTIVITY FUNCTIONS //
 /////////////////////////////
@@ -371,6 +364,19 @@ function eventClick(d) {
 
 }
 
+//////////////////////
+// REFINE FUNCTIONS //
+//////////////////////
+
+function refineOrderClick() {
+
+    d3.select(this.parentNode).selectAll('.refine-order')
+        .classed('label-selected', false)
+
+    d3.select(this)
+        .classed('label-selected', true)
+}
+
 function interaction(conflicts) {
 
     /////////////////////////////
@@ -383,26 +389,26 @@ function interaction(conflicts) {
         .on('mouseout', eventMouseOut)
         .on('click', eventClick);
 
-    /////////////////////////////////
-    // MOUSE EVENTS FOR MAIN CHART //
-    /////////////////////////////////
+    ////////////////////
+    // REFINE BUTTONS //
+    ////////////////////
 
-    d3.select('#mainChart')
-        .on('click', removeHighlight);
+    d3.selectAll('.refine-order')
+        .on('click', refineOrderClick);
 
     //////////////////
     // RADIO BUTTON //
     //////////////////
 
-    d3.selectAll('.radiobutton').on('click', function() {
+    // d3.selectAll('.radiobutton').on('click', function() {
 
-        d3.select(this.parentNode).selectAll('.radiobutton')
-            .classed('label-selected', false)
+    //     d3.select(this.parentNode).selectAll('.radiobutton')
+    //         .classed('label-selected', false)
 
-        d3.select(this)
-            .classed('label-selected', true)
+    //     d3.select(this)
+    //         .classed('label-selected', true)
 
-    })
+    // })
 }
 
 /////////////////
@@ -513,18 +519,23 @@ d3.queue()
 
 d3.select('.refine-button')
     .on('click', function() {
-        console.log('working')
+
         $header = $(this);
-        console.log($header);
+
         //getting the next element
         $content = $header.next();
+
+        $('.refine-selector').slideToggle();
+
         //open up the content needed - toggle the slide- if visible, slide up, if not slidedown.
-        $content.slideToggle(500, function() {
-            //execute this after slideToggle is done
-            //change text of header based on visibility of content div
-            $header.text(function() {
-                //change text based on condition
-                return $content.is(":visible") ? "Collapse" : "Refine";
-            });
-        });
+        // $content.slideToggle(secondaryDuration, function() {
+
+        //     //execute this after slideToggle is done
+        //     //change text of header based on visibility of content div
+        //     $header.text(function() {
+        //         //change text based on condition
+        //         return $content.is(":visible") ? "Collapse" : "Refine";
+        //     });
+
+        // });
     })
