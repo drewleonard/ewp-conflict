@@ -31,7 +31,7 @@ body {
 .site-header {
     font-size: 1em;
     height: 1em;
-    padding: 0.25em 0.50em 0.25em 0.50em;
+    padding: 0.50em 0.75em 0.50em 0.75em;
     background: #eee8d5;
     display: flex;
     align-items: center;
@@ -60,7 +60,20 @@ body {
 }
 
 .information {
+    display: flex;
+    flex-direction: row;
     flex-grow: 1;
+}
+
+.refine {
+    padding: 0.50em 0 0.50em 0;
+}
+
+.refine-button {}
+
+.refine-selector {
+    padding: 0.50em 0 0.50em 0;
+    display: none;
 }
 
 .map {
@@ -155,7 +168,6 @@ body {
     color: var(--footer-font-color);
     text-transform: uppercase;
     font-weight: bolder;
-    /* display: inline-block; */
     letter-spacing: .01em;
 }
 

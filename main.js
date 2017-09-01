@@ -278,11 +278,11 @@ function center(id) {
         })
 }
 
-///////////////////////////
-// HIGHLIGHTING FUNCTION //
-///////////////////////////
+////////////////////////////
+// HIGHLIGHTING FUNCTIONS //
+////////////////////////////
 
-function highlight(id) {
+function eventHighlight(id) {
 
     d3.selectAll('.event')
         .transition()
@@ -292,6 +292,13 @@ function highlight(id) {
                 return eventOpacity;
             }
         });
+}
+
+function removeHighlight() {
+    // d3.selectAll('.event')
+    //     .transition()
+    //     .duration(secondaryDuration)
+    //     .style('opacity', 1)
 }
 
 /////////////////////////////
@@ -360,21 +367,28 @@ function eventClick(d) {
     center(mapId);
 
     // change bar coloring
-    highlight(chartId);
+    eventHighlight(chartId);
 
 }
 
 function interaction(conflicts) {
 
-    //////////////////
-    // MOUSE EVENTS //
-    //////////////////
+    /////////////////////////////
+    // MOUSE EVENTS FOR EVENTS //
+    /////////////////////////////
 
     d3.selectAll('.event')
         .on('mouseover', eventMouseOver)
         .on('mousemove', eventMouseMove)
         .on('mouseout', eventMouseOut)
         .on('click', eventClick);
+
+    /////////////////////////////////
+    // MOUSE EVENTS FOR MAIN CHART //
+    /////////////////////////////////
+
+    d3.select('#mainChart')
+        .on('click', removeHighlight);
 
     //////////////////
     // RADIO BUTTON //
@@ -446,7 +460,10 @@ d3.queue()
             // color scale
             colorScale = d3.scaleOrdinal()
                 .domain(region)
-                .range(["#6c71c4", "#b58900", "#dc322f", "#2aa198", "#859900", "#268bd2"]);
+                .range(["#6c71c4", "#b58900",
+                    "#dc322f", "#2aa198",
+                    "#859900", "#268bd2"
+                ]);
 
             //////////////////////
             // COUNTRY CODE KEY //
@@ -489,3 +506,25 @@ d3.queue()
 
         }
     });
+
+///////////////////////////
+// TESTING REFINE BUTTON //
+///////////////////////////
+
+d3.select('.refine-button')
+    .on('click', function() {
+        console.log('working')
+        $header = $(this);
+        console.log($header);
+        //getting the next element
+        $content = $header.next();
+        //open up the content needed - toggle the slide- if visible, slide up, if not slidedown.
+        $content.slideToggle(500, function() {
+            //execute this after slideToggle is done
+            //change text of header based on visibility of content div
+            $header.text(function() {
+                //change text based on condition
+                return $content.is(":visible") ? "Collapse" : "Refine";
+            });
+        });
+    })
