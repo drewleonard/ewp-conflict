@@ -5,38 +5,31 @@
 // TODAY
 // -- forward functionality (i.e., bar clicking behavior)
 // -- reverse functionality (i.e., using map to filter, etc.)
-// -- Add regions to each area dynamically
-// -- Match countries / check which ones don't work
+// -- Check which countries don't work
 // Add data to excel file (i.e., name of event, countries involved, factions, aftermath, type of war, region)
 // Color chart radio buttons on hover
 // MAP
-// -- fix box padding / position
-// -- add automatic scaling on intialization, but think this is fixed
+// -- add automatic scaling on intialization
 // TOOLTIP
 // -- Event name
 // -- Number of casualties
 // -- Years
 // SIDE BAR ON LEFT
-// -- Title
-// -- Region
-// -- SPECIFIC INFORMATION
-// -- -- Factions
-// -- -- Deaths
-// -- -- Aftermath
 // Legend for order of bars
 // Change radio button hard coding
 // Resizing function
 // Merging functionality (d3.v4)
 // functionality when country does not exist?
 // height / bar number issue (think this is fixed), but check harding coding still
-//
 
 //////////////////////
 // GLOBAL VARIABLES //
 //////////////////////
 
-var mainDuration = 1000,
-    colorDuration = 1000 / 2;
+var primaryDuration = 1000,
+    secondaryDuration = 750;
+
+var eventOpacity = 0.30;
 
 var mapW, mapH, mapG, path, projection;
 
@@ -118,11 +111,10 @@ function drawPrimaryChart(conflicts) {
         .data(conflicts)
         .enter()
         .append('rect')
-        .attr('class', 'event') // add class to style
+        .attr('class', 'event')
+        .attr('id', function(d) { return d.ISOCODE; })
         .attr('x', function(d) { return xScale(d.STARTYEAR); })
-        .attr('y', function(d, i) {
-            return yScale(i);
-        })
+        .attr('y', function(d, i) { return yScale(i); })
         .attr('width', function(d) { return xScale(d.ENDYEAR) - xScale(d.STARTYEAR); })
         .attr('height', (h / conflicts.length) * 0.80);
 }
@@ -191,7 +183,7 @@ function orderByDate() {
             return d3.ascending(a["STARTYEAR"], b["STARTYEAR"])
         })
         .transition()
-        .duration(mainDuration)
+        .duration(primaryDuration)
         .attr('y', function(d, i) {
             return yScale(i);
         });
@@ -205,7 +197,7 @@ function colorByRegion() {
 
     mainChart.selectAll('.event')
         .transition()
-        .duration(colorDuration)
+        .duration(secondaryDuration)
         .style('fill', function(d) {
             return colorScale(d.REGION);
         })
@@ -214,7 +206,7 @@ function colorByRegion() {
 function removeColor() {
     mainChart.selectAll('.event')
         .transition()
-        .duration(colorDuration)
+        .duration(secondaryDuration)
         .style('fill', null);
 }
 
@@ -256,10 +248,7 @@ function drawMap(countries) {
         .enter()
         .insert("path", ".graticule")
         .attr("class", "country")
-        .attr("id", function(d) {
-            return '_' + parseInt(d.id);
-            // return d.name;
-        })
+        .attr("id", function(d) { return '_map_' + parseInt(d.id); })
         .attr("d", path);
 }
 
@@ -272,6 +261,7 @@ function center(id) {
     d3.select(id)
         .call(function(d) {
 
+            // calculate map scale and translation
             var bounds = path.bounds(d.datum()),
                 dx = bounds[1][0] - bounds[0][0],
                 dy = bounds[1][1] - bounds[0][1],
@@ -280,11 +270,28 @@ function center(id) {
                 scale = Math.max(1, Math.min(8, 0.9 / Math.max(dx / mapW, dy / mapH))),
                 translate = [mapW / 2 - scale * x, mapH / 2 - scale * y];
 
+            // translate and set new scale for map
             mapG.transition()
-                .duration(750)
+                .duration(secondaryDuration)
                 .attr("transform", "translate(" + translate + ")scale(" + scale + ")");
 
         })
+}
+
+///////////////////////////
+// HIGHLIGHTING FUNCTION //
+///////////////////////////
+
+function highlight(id) {
+
+    d3.selectAll('.event')
+        .transition()
+        .duration(secondaryDuration)
+        .style('opacity', function(d) {
+            if ('#_chart_' + d.ISOCODE !== id) {
+                return eventOpacity;
+            }
+        });
 }
 
 /////////////////////////////
@@ -297,16 +304,12 @@ function eventMouseOver(d) {
     d3.select(this)
         .classed('event-over', true)
 
-    /////////////
-    // TOOLTIP //
-    /////////////
-
-    // prepare text
+    // prepare text for tooltip
     var pCountry = '<p class="tooltipTextPrimary">' + d.COUNTRY + '</p>',
         pDates = '<p class="tooltipTextSecondary">' + d.STARTYEAR + " - " + d.ENDYEAR + '</p>',
         pCasualties = '<p class="tooltipTextTertiary">' + formatComma(d.AVGFAT) + " casualties" + '</p>';
 
-    // record and set locations
+    // record location for tooltip
     var top = this.getBoundingClientRect().y,
         left = this.getBoundingClientRect().x + (this.getBoundingClientRect().width / 4);
 
@@ -318,6 +321,7 @@ function eventMouseOver(d) {
 
 function eventMouseMove(d) {
 
+    // position tooltip on page
     tooltip
         .style('top', function() {
             return d3.event.pageY - ($(this).height() * (3 / 2)) + "px";
@@ -333,22 +337,30 @@ function eventMouseOut(d) {
     d3.select(this)
         .classed('event-over', false)
 
+    // remove tooltip
     tooltip
         .style('display', 'none')
 }
 
 function eventClick(d) {
 
-    var id = '#_' + d.ISOCODE;
-    // var id = '#_004'
+    // get unique country id
+    var mapId = '#_map_' + d.ISOCODE,
+        chartId = '#_chart_' + d.ISOCODE;
 
+    // remove any colored countries
     d3.selectAll('.country')
         .classed('country-over', false)
 
-    d3.select(id)
+    // color newly selected country
+    d3.select(mapId)
         .classed('country-over', true);
 
-    center(id);
+    // center map on newly selected country
+    center(mapId);
+
+    // change bar coloring
+    highlight(chartId);
 
 }
 
@@ -384,7 +396,6 @@ function interaction(conflicts) {
 /////////////////
 
 var conflicts = "conflicts.csv",
-    // conflicts = "ewp-conflicts-data.csv",
     countryCodeKey = "countryCodeKey.csv",
     topojsonMap = "https://unpkg.com/world-atlas@1/world/110m.json",
     countryJson = "countryIso.json";
@@ -415,26 +426,27 @@ d3.queue()
             // process world map json data
             var countries = topojson.feature(world, world.objects.countries).features;
 
-            // connect world map data to country names
-            // this should be changed
+            // merge world map data with country names
             countries = countries.filter(function(d) {
                 return countryJson.some(function(n) {
-                    if (d.id == n['country-code']) return d.name = n.name, d.region = n.region;
+                    if (d.id == n['country-code']) return d.name = n.name;
                 })
-            })
+            });
 
             /////////////////
             // REGION DATA //
             /////////////////
 
             // get unique region values
-            region = countries.map(function(obj) { return obj.region; });
+            region = conflicts.map(function(obj) { return obj.REGION; });
             region = region.filter(function(v, i) { return region.indexOf(v) == i; });
+
+            console.log(region);
 
             // color scale
             colorScale = d3.scaleOrdinal()
                 .domain(region)
-                .range(["#6c71c4", "#b58900", "#dc322f", "#2aa198", "#859900"]);
+                .range(["#6c71c4", "#b58900", "#dc322f", "#2aa198", "#859900", "#268bd2"]);
 
             //////////////////////
             // COUNTRY CODE KEY //
@@ -460,20 +472,15 @@ d3.queue()
                 d['STARTYEAR'] = +d['STARTYEAR'];
                 d['ENDYEAR'] = +d['ENDYEAR'];
 
-                // assigning region to country
-                let country = countryJson.find(o => o.name === d.COUNTRY)
-                if (country !== undefined) {
-                    d.REGION = country.region
-                }
-
                 // assigning iso code to country
                 let key = countryCodeKey.find(o => o.cown === d.COWCCODE);
                 if (key !== undefined) {
                     d['ISOCODE'] = key.iso3n;
-                    console.log(key)
                 }
 
             });
+
+            console.log(conflicts);
 
             drawPrimaryChart(conflicts);
             orderByDeath();

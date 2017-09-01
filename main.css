@@ -1,6 +1,6 @@
 :root {
     --primary-color: #fdf6e3;
-    /* --primary-font: 'Fira Sans', sans-serif; */
+    --primary-font: 'Fira Sans', sans-serif;
     --primary-font-size: 20px;
     --primary-font-color: #586e75;
     --secondary-font-color: #268bd2;
@@ -71,7 +71,7 @@ body {
 .country {
     fill: #93a1a1;
     padding: 0.25em 0 0 0;
-    stroke: 2px;
+    stroke: 1px;
     stroke-opacity: 0;
 }
 
