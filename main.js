@@ -10,10 +10,6 @@
 // Color chart radio buttons on hover
 // MAP
 // -- add automatic scaling on intialization
-// TOOLTIP
-// -- Event name
-// -- Number of casualties
-// -- Years
 // SIDE BAR ON LEFT
 // Legend for order of bars
 // Change radio button hard coding
@@ -21,6 +17,9 @@
 // Merging functionality (d3.v4)
 // functionality when country does not exist?
 // height / bar number issue (think this is fixed), but check harding coding still
+// STATISTICS
+// -- how selected conflict compares to all conflicts
+// -- overall trend of conflict in the region relative to total conflict
 
 //////////////////////
 // GLOBAL VARIABLES //
@@ -37,13 +36,19 @@ var formatComma = d3.format(',');
 
 var region, colorScale;
 
+var chartLegnedText = ["Deaths"];
+
 ///////////////////
 // PAGE ELEMENTS //
 ///////////////////
 
-var mainChart = d3.select('.chart-main')
+var chartMain = d3.select('.chart-main')
     .append('svg')
-    .attr('id', 'mainChart');
+    .attr('id', 'chartMain');
+
+var chartLegend = d3.select('.chart-legend')
+    .append('svg')
+    .attr('id', 'chartLegend');
 
 var map = d3.select('.map')
     .append('svg')
@@ -51,9 +56,109 @@ var map = d3.select('.map')
 
 var tooltip = d3.select('.tooltip');
 
-//////////////////////////////
-// PRIMARY DRAWING FUNCTION //
-//////////////////////////////
+//////////////////////////////////
+// DRAWING PRIMARY CHART LEGEND //
+//////////////////////////////////
+
+function drawChartLegendText(textData) {
+
+    ////////////////
+    // DIMENSIONS //
+    ////////////////
+
+    var w = parseInt($('.chart-legend').css('width')) / (3 / 2),
+        h = parseInt($('.chart-legend').css('height'));
+
+    var markerOffset = 20;
+
+    // join data
+    var text = chartLegend.selectAll('text')
+        .data(textData, function(d) { return d; });
+
+    // exit old elements in data
+    text.exit()
+        .remove();
+
+    // update data
+    text
+        .attr('x', function() {
+            return -(this.getComputedTextLength() + markerOffset)
+        });
+
+    // enter new elements in data
+    text.enter()
+        .append('text')
+        .attr('class', 'chart-legend-text')
+        .text(function(d) { return d; })
+        .attr('x', function() {
+            return -(this.getComputedTextLength() + markerOffset)
+        })
+        .attr('y', w / 2)
+        .attr('dy', '.35em')
+        .attr("transform", function(d) {
+            return "rotate(-90)"
+        });
+}
+
+function drawChartLegend() {
+
+    ////////////////
+    // DIMENSIONS //
+    ////////////////
+
+    var w = parseInt($('.chart-legend').css('width')) / (3 / 2),
+        h = parseInt($('.chart-legend').css('height'));
+
+    chartLegend
+        .attr('width', w)
+        .attr('height', h);
+
+    var markerHeight = 1,
+        markerOffset = 20;
+
+    //////////////////
+    // ARROW MARKER //
+    //////////////////
+
+    var defs = chartLegend
+        .append('defs');
+
+    defs
+        .append('marker')
+        .attr('id', 'marker')
+        .attr('viewBox', '0 -5 10 10')
+        .attr('refX', 0)
+        .attr('refY', 0)
+        .attr('markerWidth', w)
+        .attr('markerHeight', markerHeight)
+        .attr('orient', 'auto')
+        .append('path')
+        .attr("d", "M0,-5L10,0L0,5");
+
+    ///////////////
+    // DRAW LINE //
+    ///////////////
+
+    chartLegend
+        .append('line')
+        .attr('class', 'marker')
+        .attr('marker-end', 'url(#marker)')
+        .attr('x1', w / 2)
+        .attr('x2', w / 2)
+        .attr('y1', h)
+        .attr('y2', markerOffset)
+
+    ///////////////
+    // DRAW TEXT //
+    ///////////////
+
+    drawChartLegendText(["Deaths"]);
+
+}
+
+///////////////////////////
+// DRAWING PRIMARY CHART //
+///////////////////////////
 
 function drawPrimaryChart(conflicts) {
 
@@ -64,7 +169,7 @@ function drawPrimaryChart(conflicts) {
     var w = parseInt($('.chart-main').css('width')),
         h = parseInt($('.chart-main').css('height'));
 
-    mainChart
+    chartMain
         .attr('width', w)
         .attr('height', h);
 
@@ -95,7 +200,7 @@ function drawPrimaryChart(conflicts) {
         .tickSize(h - 25)
         .tickFormat(d3.format(''));
 
-    mainChart.append('g')
+    chartMain.append('g')
         .attr('class', 'axis')
         .attr('transform', 'translate(0,25)')
         .call(xAxis);
@@ -107,7 +212,7 @@ function drawPrimaryChart(conflicts) {
     // ADDING EVENT ELEMENTS //
     ///////////////////////////
 
-    var event = mainChart.selectAll('.event')
+    var event = chartMain.selectAll('.event')
         .data(conflicts)
         .enter()
         .append('rect')
@@ -117,6 +222,13 @@ function drawPrimaryChart(conflicts) {
         .attr('y', function(d, i) { return yScale(i); })
         .attr('width', function(d) { return xScale(d.ENDYEAR) - xScale(d.STARTYEAR); })
         .attr('height', (h / conflicts.length) * 0.80);
+
+    /////////////////////////////////
+    // DRAWING ACCOMPANYING LEGEND //
+    /////////////////////////////////
+
+    drawChartLegend();
+
 }
 
 ////////////////////////
@@ -145,15 +257,19 @@ function orderByDeath() {
     // TRANSITION //
     ////////////////
 
-    mainChart.selectAll('.event')
+    chartMain.selectAll('.event')
         .sort(function(a, b) {
-            return d3.ascending(+a.AVGFAT, +b.AVGFAT);
+            return d3.descending(+a.AVGFAT, +b.AVGFAT);
         })
         .transition()
         .duration(1000)
         .attr('y', function(d, i) {
             return yScale(i);
         });
+
+    chartLegnedText = ["Deaths"];
+    drawChartLegendText(["Deaths"]);
+
 }
 
 function orderByDate() {
@@ -178,15 +294,20 @@ function orderByDate() {
     // TRANSITION //
     ////////////////
 
-    mainChart.selectAll('.event')
+    chartMain.selectAll('.event')
         .sort(function(a, b) {
-            return d3.ascending(a["STARTYEAR"], b["STARTYEAR"])
+            return d3.descending(a["STARTYEAR"], b["STARTYEAR"])
         })
         .transition()
         .duration(primaryDuration)
         .attr('y', function(d, i) {
             return yScale(i);
         });
+
+    chartLegnedText = ["Year"];
+    drawChartLegendText(["Year"]);
+    // chartLegend.selectAll('text').text("Year")
+
 }
 
 ////////////////////////
@@ -195,7 +316,7 @@ function orderByDate() {
 
 function colorByRegion() {
 
-    mainChart.selectAll('.event')
+    chartMain.selectAll('.event')
         .transition()
         .duration(secondaryDuration)
         .style('fill', function(d) {
@@ -204,7 +325,7 @@ function colorByRegion() {
 }
 
 function removeColor() {
-    mainChart.selectAll('.event')
+    chartMain.selectAll('.event')
         .transition()
         .duration(secondaryDuration)
         .style('fill', null);
@@ -368,6 +489,10 @@ function eventClick(d) {
 // REFINE FUNCTIONS //
 //////////////////////
 
+function refineToggle() {
+    $('.refine-selector').slideToggle();
+}
+
 function refineOrderClick() {
 
     d3.select(this.parentNode).selectAll('.refine-order')
@@ -389,26 +514,16 @@ function interaction(conflicts) {
         .on('mouseout', eventMouseOut)
         .on('click', eventClick);
 
-    ////////////////////
-    // REFINE BUTTONS //
-    ////////////////////
+    ///////////////////
+    // REFINE BUTTON //
+    ///////////////////
+
+    d3.select('.refine-button')
+        .on('click', refineToggle)
 
     d3.selectAll('.refine-order')
         .on('click', refineOrderClick);
 
-    //////////////////
-    // RADIO BUTTON //
-    //////////////////
-
-    // d3.selectAll('.radiobutton').on('click', function() {
-
-    //     d3.select(this.parentNode).selectAll('.radiobutton')
-    //         .classed('label-selected', false)
-
-    //     d3.select(this)
-    //         .classed('label-selected', true)
-
-    // })
 }
 
 /////////////////
@@ -512,30 +627,3 @@ d3.queue()
 
         }
     });
-
-///////////////////////////
-// TESTING REFINE BUTTON //
-///////////////////////////
-
-d3.select('.refine-button')
-    .on('click', function() {
-
-        $header = $(this);
-
-        //getting the next element
-        $content = $header.next();
-
-        $('.refine-selector').slideToggle();
-
-        //open up the content needed - toggle the slide- if visible, slide up, if not slidedown.
-        // $content.slideToggle(secondaryDuration, function() {
-
-        //     //execute this after slideToggle is done
-        //     //change text of header based on visibility of content div
-        //     $header.text(function() {
-        //         //change text based on condition
-        //         return $content.is(":visible") ? "Collapse" : "Refine";
-        //     });
-
-        // });
-    })

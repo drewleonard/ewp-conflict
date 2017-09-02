@@ -1,6 +1,6 @@
 :root {
     --primary-color: #fdf6e3;
-    --primary-font: 'Fira Sans', sans-serif;
+    --primary-font: 'Roboto', sans-serif;
     --primary-font-size: 20px;
     --primary-font-color: #586e75;
     --secondary-font-color: #268bd2;
@@ -17,7 +17,7 @@ body {
     font-family: var(--primary-font);
     font-size: var(--primary-font-size);
     color: var(--primary-font-color);
-    /* overflow: hidden; */
+    overflow: hidden;
     display: flex;
     flex-flow: column;
 }
@@ -29,7 +29,7 @@ body {
 }
 
 .site-header {
-    font-size: 1em;
+    font-size: 1.25em;
     height: 1em;
     padding: 0.50em 0.75em 0.50em 0.75em;
     background: #eee8d5;
@@ -60,16 +60,19 @@ body {
     border-right: solid #93a1a1 3px;
 }
 
-.information {
-    display: flex;
-    flex-direction: row;
+.information-primary {
     flex-grow: 1;
+    padding: 1em 0.75em 1em 0.75em;
+}
+
+.information-primary-text {
+    font-size: 0.75em;
+    padding-bottom: 1em;
 }
 
 .refine {
     padding: 1em 0.75em 1em 0.75em;
     border-top: solid #93a1a1 2px;
-    border-bottom: solid #93a1a1 2px;
 }
 
 .refine-button {
@@ -80,12 +83,12 @@ body {
 .refine-selector {
     display: none;
     font-size: 0.75em;
-    padding: 0.50em 0 0 0em;
 }
 
 .refine-flex-container {
     display: flex;
     flex-direction: row;
+    padding: 0.50em 0 0 0em;
 }
 
 .refine-order {
@@ -95,6 +98,17 @@ body {
 
 .refine-selector-selected {
     fill: #268bd2;
+}
+
+.legend {
+    padding: 1em 0.75em 1em 0.75em;
+    border-top: solid #93a1a1 2px;
+    border-bottom: solid #93a1a1 2px;
+}
+
+.legend-button {
+    cursor: pointer;
+    font-weight: 700;
 }
 
 .map {
@@ -117,8 +131,28 @@ body {
 .site-content-right {
     flex-grow: 1;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     padding: 0.50em 0.5em 0.50em 0.5em;
+}
+
+.chart-legend {
+    width: 1.5em;
+}
+
+.chart-legend-text {
+    font-size: 0.75em;
+    font-weight: 700;
+    text-transform: uppercase;
+    fill: #93a1a1;
+}
+
+.marker {
+    stroke-width: 1em;
+    stroke: #eee8d5;
+}
+
+#marker {
+    fill: #eee8d5;
 }
 
 .chart-button {
@@ -135,7 +169,6 @@ body {
     display: flex;
     flex-direction: row;
     margin: 0 50px 0 0;
-    /* flex-basis: auto; */
 }
 
 .button-color {
@@ -170,7 +203,6 @@ body {
 
 .chart-bold {
     font-weight: bolder;
-    /* margin-right: 10px; */
 }
 
 .chart-main {
