@@ -36,23 +36,37 @@ var formatComma = d3.format(',');
 
 var region, colorScale;
 
+var solarized = [
+    "#6c71c4", "#b58900",
+    "#dc322f", "#2aa198",
+    "#859900", "#268bd2"
+];
+
 var chartLegnedText = ["Deaths"];
 
-///////////////////
-// PAGE ELEMENTS //
-///////////////////
+/////////////////////////////////
+// SVG AND OTHER PAGE ELEMENTS //
+/////////////////////////////////
 
 var chartMain = d3.select('.chart-main')
     .append('svg')
     .attr('id', 'chartMain');
 
-var chartLegend = d3.select('.chart-legend')
+var legendChart = d3.select('.chart-legend')
     .append('svg')
-    .attr('id', 'chartLegend');
+    .attr('id', 'legendChart');
 
 var map = d3.select('.map')
     .append('svg')
     .attr('id', 'map');
+
+var legendRegionColor = d3.select('.legend-region-color')
+    .append('svg')
+    .attr('id', 'legendRegionColor');
+
+var legendRegionLabel = d3.select('.legend-region-label')
+    .append('svg')
+    .attr('id', 'legendRegionLabel');
 
 var tooltip = d3.select('.tooltip');
 
@@ -60,7 +74,7 @@ var tooltip = d3.select('.tooltip');
 // DRAWING PRIMARY CHART LEGEND //
 //////////////////////////////////
 
-function drawChartLegendText(textData) {
+function drawlegendChartText(textData) {
 
     ////////////////
     // DIMENSIONS //
@@ -72,7 +86,7 @@ function drawChartLegendText(textData) {
     var markerOffset = 20;
 
     // join data
-    var text = chartLegend.selectAll('text')
+    var text = legendChart.selectAll('text')
         .data(textData, function(d) { return d; });
 
     // exit old elements in data
@@ -100,7 +114,7 @@ function drawChartLegendText(textData) {
         });
 }
 
-function drawChartLegend() {
+function drawlegendChart() {
 
     ////////////////
     // DIMENSIONS //
@@ -109,7 +123,7 @@ function drawChartLegend() {
     var w = parseInt($('.chart-legend').css('width')) / (3 / 2),
         h = parseInt($('.chart-legend').css('height'));
 
-    chartLegend
+    legendChart
         .attr('width', w)
         .attr('height', h);
 
@@ -120,15 +134,14 @@ function drawChartLegend() {
     // ARROW MARKER //
     //////////////////
 
-    var defs = chartLegend
+    var defs = legendChart
         .append('defs');
 
     defs
         .append('marker')
         .attr('id', 'marker')
         .attr('viewBox', '0 -5 10 10')
-        .attr('refX', 0)
-        .attr('refY', 0)
+        .attr('refX', 0).attr('refY', 0)
         .attr('markerWidth', w)
         .attr('markerHeight', markerHeight)
         .attr('orient', 'auto')
@@ -139,7 +152,7 @@ function drawChartLegend() {
     // DRAW LINE //
     ///////////////
 
-    chartLegend
+    legendChart
         .append('line')
         .attr('class', 'marker')
         .attr('marker-end', 'url(#marker)')
@@ -152,7 +165,7 @@ function drawChartLegend() {
     // DRAW TEXT //
     ///////////////
 
-    drawChartLegendText(["Deaths"]);
+    drawlegendChartText(["Deaths"]);
 
 }
 
@@ -227,7 +240,7 @@ function drawPrimaryChart(conflicts) {
     // DRAWING ACCOMPANYING LEGEND //
     /////////////////////////////////
 
-    drawChartLegend();
+    drawlegendChart();
 
 }
 
@@ -268,7 +281,7 @@ function orderByDeath() {
         });
 
     chartLegnedText = ["Deaths"];
-    drawChartLegendText(["Deaths"]);
+    drawlegendChartText(["Deaths"]);
 
 }
 
@@ -305,8 +318,8 @@ function orderByDate() {
         });
 
     chartLegnedText = ["Year"];
-    drawChartLegendText(["Year"]);
-    // chartLegend.selectAll('text').text("Year")
+    drawlegendChartText(["Year"]);
+    // legendChart.selectAll('text').text("Year")
 
 }
 
@@ -322,6 +335,8 @@ function colorByRegion() {
         .style('fill', function(d) {
             return colorScale(d.REGION);
         })
+
+    legendToggle();
 }
 
 function removeColor() {
@@ -329,6 +344,86 @@ function removeColor() {
         .transition()
         .duration(secondaryDuration)
         .style('fill', null);
+}
+
+//////////////////////////////
+// LEGEND DRAWING FUNCTIONS //
+//////////////////////////////
+
+function drawLegendRegionColor() {
+
+    ////////////////
+    // DIMENSIONS //
+    ////////////////
+
+    var w = parseInt($('.legend-region-color').css('width')),
+        h = parseInt($('.legend-region-color').css('height'));
+
+    var step = w / 2;
+
+    legendRegionColor
+        .attr('width', w)
+        .attr('height', h);
+
+    ////////////////////////////
+    // DRAWING LEGEND SQAURES //
+    ////////////////////////////
+
+    legendRegionColor.selectAll('.square')
+        .data(solarized)
+        .enter()
+        .append('rect')
+        .attr('x', 0)
+        .attr('y', function(d, i) {
+            return step + (i * w * 2)
+        })
+        .attr('width', w)
+        .attr('height', w)
+        .attr('fill', function(d) {
+            return d;
+        });
+
+}
+
+function drawLegendRegionLabel() {
+
+    ////////////////
+    // DIMENSIONS //
+    ////////////////
+
+    var w = parseInt($('.legend-region-label').css('width')),
+        h = parseInt($('.legend-region-label').css('height')),
+        squareW = parseInt($('.legend-region-color').css('width'));
+
+    console.log(w, h)
+
+    var step = squareW / 2;
+
+    legendRegionLabel
+        .attr('width', w)
+        .attr('height', h);
+
+    ///////////////////////////
+    // DRAWING LEGEND LABELS //
+    ///////////////////////////
+
+    legendRegionLabel.selectAll('.label')
+        .data(region)
+        .enter()
+        .append('text')
+        .attr('x', 0)
+        .attr('y', function(d, i) {
+            return step + squareW + (i * squareW * 2)
+        })
+        .text(function(d) {
+            return d;
+        })
+
+}
+
+function drawLegendRegion() {
+    drawLegendRegionColor();
+    drawLegendRegionLabel();
 }
 
 //////////////////////////
@@ -485,23 +580,6 @@ function eventClick(d) {
 
 }
 
-//////////////////////
-// REFINE FUNCTIONS //
-//////////////////////
-
-function refineToggle() {
-    $('.refine-selector').slideToggle();
-}
-
-function refineOrderClick() {
-
-    d3.select(this.parentNode).selectAll('.refine-order')
-        .classed('label-selected', false)
-
-    d3.select(this)
-        .classed('label-selected', true)
-}
-
 function interaction(conflicts) {
 
     /////////////////////////////
@@ -519,11 +597,48 @@ function interaction(conflicts) {
     ///////////////////
 
     d3.select('.refine-button')
-        .on('click', refineToggle)
+        .on('click', refineToggle);
 
     d3.selectAll('.refine-order')
         .on('click', refineOrderClick);
 
+    ///////////////////
+    // LEGEND BUTTON //
+    ///////////////////
+
+    d3.select('.legend-button')
+        .on('click', legendToggle);
+
+}
+
+//////////////////////
+// REFINE FUNCTIONS //
+//////////////////////
+
+function refineToggle() {
+    $('.refine-selector').slideToggle();
+}
+
+function refineOrderClick() {
+
+    d3.select(this.parentNode).selectAll('.refine-order')
+        .classed('label-selected', false)
+
+    d3.select(this)
+        .classed('label-selected', true)
+}
+
+//////////////////////
+// LEGEND FUNCTIONS //
+//////////////////////
+
+function legendToggle() {
+
+    // make legend visible
+    $('.legend-selector').slideToggle();
+
+    // draw legend because we calculate dimensions dynamically
+    drawLegendRegion();
 }
 
 /////////////////
@@ -576,15 +691,10 @@ d3.queue()
             region = conflicts.map(function(obj) { return obj.REGION; });
             region = region.filter(function(v, i) { return region.indexOf(v) == i; });
 
-            console.log(region);
-
             // color scale
             colorScale = d3.scaleOrdinal()
                 .domain(region)
-                .range(["#6c71c4", "#b58900",
-                    "#dc322f", "#2aa198",
-                    "#859900", "#268bd2"
-                ]);
+                .range(solarized);
 
             //////////////////////
             // COUNTRY CODE KEY //
@@ -618,10 +728,9 @@ d3.queue()
 
             });
 
-            console.log(conflicts);
-
             drawPrimaryChart(conflicts);
             orderByDeath();
+            drawLegendRegion();
             drawMap(countries);
             interaction(conflicts);
 

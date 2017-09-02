@@ -111,10 +111,32 @@ body {
     font-weight: 700;
 }
 
+.legend-selector {
+    display: none;
+    font-size: 0.75em;
+}
+
+.legend-flex-container {
+    display: flex;
+    flex-direction: row;
+    padding: 0.50em 0 0 0em;
+    height: 120px;
+}
+
+.legend-region-color {
+    width: 10px;
+    height: 120px;
+    padding-right: 0.50em;
+}
+
+.legend-region-label {
+    flex: 1 1 auto;
+    fill: #586e75;
+}
+
 .map {
     height: 200px;
     border-bottom: solid #93a1a1 2px;
-    /* border: solid #93a1a1 1px; */
 }
 
 .country {
@@ -239,8 +261,6 @@ body {
     color: var(--footer-font-color);
     text-transform: uppercase;
     font-weight: normal;
-    /* display: ; */
-    /* letter-spacing: .01em; */
 }
 
 .event {
