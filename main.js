@@ -326,7 +326,6 @@ function orderByDate() {
 
     chartLegnedText = ["Year"];
     drawlegendChartText(["Year"]);
-    // legendChart.selectAll('text').text("Year")
 
 }
 
@@ -401,8 +400,6 @@ function drawLegendRegionLabel() {
     var w = parseInt($('.legend-region-label').css('width')),
         h = parseInt($('.legend-region-label').css('height')),
         squareW = parseInt($('.legend-region-color').css('width'));
-
-    console.log(w, h)
 
     var step = squareW / 2;
 
@@ -538,6 +535,17 @@ function addInformation(d) {
 
     d3.select('.information-country-death-value')
         .html(formatComma(d.AVGFAT));
+
+    d3.select('.information-country-region-value')
+        .html(function() {
+            if (d.REGION.includes("and")) {
+                var arr = d.REGION.split('and');
+                return arr[0] + ' and' + '</br>' + arr[1];
+            } else {
+                return d.REGION
+            }
+
+        });
 
     // adding information
     $('.information-country').show();
