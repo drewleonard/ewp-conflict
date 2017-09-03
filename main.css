@@ -29,7 +29,7 @@ body {
 }
 
 .site-header {
-    font-size: 1.25em;
+    font-size: 1em;
     height: 1em;
     padding: 0.50em 0.75em 0.50em 0.75em;
     background: #eee8d5;
@@ -49,7 +49,6 @@ body {
     flex: 1;
     display: flex;
     flex-direction: row;
-    /* padding: 0.25em 0.50em 0.25em 0.50em; */
 }
 
 .site-content-left {
@@ -60,14 +59,49 @@ body {
     border-right: solid #93a1a1 3px;
 }
 
-.information-primary {
+.information {
     flex-grow: 1;
-    padding: 1em 0.75em 1em 0.75em;
+    padding: 0.50em 0.75em 0.50em 0.75em;
 }
 
-.information-primary-text {
+.information-primary {
     font-size: 0.75em;
     padding-bottom: 1em;
+}
+
+.information-country {
+    display: none;
+    font-size: 1em;
+}
+
+.information-country-country {
+    font-size: 1em;
+    font-weight: 700;
+    padding: 0 0 20px 0;
+}
+
+.information-country-shortdescription {
+    font-size: 0.60em;
+    color: #93a1a1;
+    margin: 0 0 20px 0;
+}
+
+.information-country-year,
+.information-country-death {
+    font-size: 0.75em;
+    border-top: solid #93a1a1 1px;
+    margin: 0 0 5px 0;
+    padding: 5px 0 0 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.information-country-year-label,
+.information-country-death-label {
+    text-transform: uppercase;
+    color: #93a1a1;
+    flex-shrink: 1;
 }
 
 .refine {

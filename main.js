@@ -3,6 +3,7 @@
 //////////
 
 // TODAY
+// add solarized color to selected bar
 // -- forward functionality (i.e., bar clicking behavior)
 // -- reverse functionality (i.e., using map to filter, etc.)
 // -- Check which countries don't work
@@ -20,6 +21,10 @@
 // STATISTICS
 // -- how selected conflict compares to all conflicts
 // -- overall trend of conflict in the region relative to total conflict
+// -- size of conflict (i.e., duration or years) relative to other conflicts in country, region, or totally
+// -- -- tree map is a small option
+// -- -- better option is waffle chart
+// -- -- deaths per year on average
 
 //////////////////////
 // GLOBAL VARIABLES //
@@ -29,6 +34,8 @@ var primaryDuration = 1000,
     secondaryDuration = 750;
 
 var eventOpacity = 0.30;
+
+var selectedEvent;
 
 var mapW, mapH, mapG, path, projection;
 
@@ -510,6 +517,33 @@ function eventHighlight(id) {
         });
 }
 
+////////////////////////
+// ADDING INFORMATION //
+////////////////////////
+
+function addInformation(d) {
+
+    // removing primary information
+    $('.information-primary').hide();
+
+    // updating information
+    d3.select('.information-country-country')
+        .html(d.COUNTRY);
+
+    d3.select('.information-country-shortdescription')
+        .html(d.SHORTDESCRIPTION);
+
+    d3.select('.information-country-year-value')
+        .html(d.STARTYEAR + ' - ' + d.ENDYEAR);
+
+    d3.select('.information-country-death-value')
+        .html(formatComma(d.AVGFAT));
+
+    // adding information
+    $('.information-country').show();
+
+}
+
 /////////////////////////////
 // INTERACTIVITY FUNCTIONS //
 /////////////////////////////
@@ -549,9 +583,11 @@ function eventMouseMove(d) {
 
 function eventMouseOut(d) {
 
-    // remove bar color
-    d3.select(this)
-        .classed('event-over', false)
+    // remove bar color if event is not selected by eventClick()
+    if (this !== selectedEvent) {
+        d3.select(this)
+            .classed('event-over', false)
+    }
 
     // remove tooltip
     tooltip
@@ -559,6 +595,9 @@ function eventMouseOut(d) {
 }
 
 function eventClick(d) {
+
+    // record selected event
+    selectedEvent = this;
 
     // get unique country id
     var mapId = '#_map_' + d.ISOCODE,
@@ -572,11 +611,22 @@ function eventClick(d) {
     d3.select(mapId)
         .classed('country-over', true);
 
+    // remove any colored bars
+    d3.selectAll('.event')
+        .classed('event-over', false);
+
+    // color newly selected event
+    d3.select(this)
+        .classed('event-over', true);
+
     // center map on newly selected country
     center(mapId);
 
     // change bar coloring
     eventHighlight(chartId);
+
+    // changing information div
+    addInformation(d);
 
 }
 
@@ -616,6 +666,8 @@ function interaction(conflicts) {
 //////////////////////
 
 function refineToggle() {
+
+    // toggle refine selector up or down
     $('.refine-selector').slideToggle();
 }
 
@@ -634,7 +686,7 @@ function refineOrderClick() {
 
 function legendToggle() {
 
-    // make legend visible
+    // toggle legend up or down
     $('.legend-selector').slideToggle();
 
     // draw legend because we calculate dimensions dynamically
