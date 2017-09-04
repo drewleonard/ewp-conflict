@@ -25,6 +25,8 @@
 // -- -- tree map is a small option
 // -- -- better option is waffle chart
 // -- -- deaths per year on average
+// South Sudan has 0 deaths
+// Search for a country?
 
 //////////////////////
 // GLOBAL VARIABLES //
@@ -33,11 +35,11 @@
 var primaryDuration = 1000,
     secondaryDuration = 750;
 
-var eventOpacity = 0.30;
+var eventOpacity = 0.20;
 
 var selectedEvent;
 
-var mapW, mapH, mapG, path, projection;
+var countries, mapW, mapH, mapG, path, projection;
 
 var formatComma = d3.format(',');
 
@@ -201,7 +203,7 @@ function drawPrimaryChart(conflicts) {
         .range([0, w])
         .domain([
             d3.min(conflicts, function(d) { return d.STARTYEAR || Infinity; }),
-            d3.max(conflicts, function(d) { return d.STARTYEAR; })
+            d3.max(conflicts, function() { return (new Date()).getFullYear(); })
         ]);
 
     var yScale = d3.scaleLinear()
@@ -217,6 +219,7 @@ function drawPrimaryChart(conflicts) {
 
     var xAxis = d3.axisBottom()
         .scale(xScale)
+        .ticks(20)
         .tickSize(h - 25)
         .tickFormat(d3.format(''));
 
@@ -240,7 +243,18 @@ function drawPrimaryChart(conflicts) {
         .attr('id', function(d) { return d.ISOCODE; })
         .attr('x', function(d) { return xScale(d.STARTYEAR); })
         .attr('y', function(d, i) { return yScale(i); })
-        .attr('width', function(d) { return xScale(d.ENDYEAR) - xScale(d.STARTYEAR); })
+        .attr('width', function(d) {
+            if (d.ENDYEAR === "ONGOING") {
+                return xScale((new Date()).getFullYear()) - xScale(d.STARTYEAR);
+            } else {
+                if (xScale(d.ENDYEAR) - xScale(d.STARTYEAR) !== 0) {
+                    return xScale(d.ENDYEAR) - xScale(d.STARTYEAR);
+                } else {
+                    return xScale(d.ENDYEAR + 1) - xScale(d.STARTYEAR);
+                }
+            }
+
+        })
         .attr('height', (h / conflicts.length) * 0.80);
 
     /////////////////////////////////
@@ -268,10 +282,10 @@ function orderByDeath() {
     // SCALE //
     ///////////
 
-    // WARNING: 131 IS HARD CODED!
+    // WARNING: 127 IS HARD CODED!
     var yScale = d3.scaleLinear()
         .range([20, h])
-        .domain([0, 131])
+        .domain([0, 127])
 
     ////////////////
     // TRANSITION //
@@ -305,10 +319,10 @@ function orderByDate() {
     // SCALE //
     ///////////
 
-    // WARNING: 131 IS HARD CODED!
+    // WARNING: 127 IS HARD CODED!
     var yScale = d3.scaleLinear()
         .range([20, h])
-        .domain([0, 131])
+        .domain([0, 127])
 
     ////////////////
     // TRANSITION //
@@ -463,6 +477,7 @@ function drawMap(countries) {
     // DRAWING MAP //
     /////////////////
 
+
     mapG.selectAll(".country")
         .data(countries)
         .enter()
@@ -502,7 +517,7 @@ function center(id) {
 // HIGHLIGHTING FUNCTIONS //
 ////////////////////////////
 
-function eventHighlight(id) {
+function eventAddHighlight(id) {
 
     d3.selectAll('.event')
         .transition()
@@ -514,13 +529,29 @@ function eventHighlight(id) {
         });
 }
 
+function eventRemoveHighlight() {
+
+    d3.selectAll('.event')
+        .transition()
+        .duration(secondaryDuration)
+        .style('opacity', null);
+
+    d3.selectAll('.event')
+        .classed('event-over', false);
+
+    $('.information-country').hide();
+
+    $('.information-primary').show();
+
+}
+
 ////////////////////////
 // ADDING INFORMATION //
 ////////////////////////
 
 function addInformation(d) {
 
-    // removing primary information
+    // filermoving primary information
     $('.information-primary').hide();
 
     // updating information
@@ -582,10 +613,20 @@ function eventMouseMove(d) {
     // position tooltip on page
     tooltip
         .style('top', function() {
-            return d3.event.pageY - ($(this).height() * (3 / 2)) + "px";
+            if (d3.event.pageY - ($(this).height() * (3 / 2)) > 0) {
+                return d3.event.pageY - ($(this).height() * (3 / 2)) + "px";
+            } else {
+                return d3.event.pageY + ($(this).height() * (1 / 3)) + "px";
+            }
+
         })
         .style('left', function() {
-            return d3.event.pageX + "px";
+            if (d3.event.pageX + ($(this).width()) < $('body').width()) {
+                return d3.event.pageX + "px";
+            } else {
+                return d3.event.pageX - ($(this).width()) - 10 + "px";
+            }
+
         });
 }
 
@@ -613,11 +654,23 @@ function eventClick(d) {
 
     // remove any colored countries
     d3.selectAll('.country')
-        .classed('country-over', false)
+        .classed('country-over', false);
 
-    // color newly selected country
-    d3.select(mapId)
-        .classed('country-over', true);
+
+    try {
+
+        // color newly selected country
+        d3.select(mapId)
+            .classed('country-over', true);
+
+        // center map on newly selected country
+        center(mapId);
+
+    } catch (TypeError) {
+
+        console.log(TypeError + ': problem drawing map');
+
+    }
 
     // remove any colored bars
     d3.selectAll('.event')
@@ -627,11 +680,8 @@ function eventClick(d) {
     d3.select(this)
         .classed('event-over', true);
 
-    // center map on newly selected country
-    center(mapId);
-
     // change bar coloring
-    eventHighlight(chartId);
+    eventAddHighlight(chartId);
 
     // changing information div
     addInformation(d);
@@ -666,6 +716,16 @@ function interaction(conflicts) {
 
     d3.select('.legend-button')
         .on('click', legendToggle);
+
+    /////////////////////
+    // CHART SELECTION //
+    /////////////////////
+
+    document.getElementById('chart-main').onclick = function(e) {
+        if (!e.target.hasAttribute('class', 'event')) {
+            eventRemoveHighlight();
+        }
+    }
 
 }
 
@@ -734,7 +794,7 @@ d3.queue()
             //////////////
 
             // process world map json data
-            var countries = topojson.feature(world, world.objects.countries).features;
+            countries = topojson.feature(world, world.objects.countries).features;
 
             // merge world map data with country names
             countries = countries.filter(function(d) {
@@ -778,7 +838,10 @@ d3.queue()
                 d['CIVFATHIGH'] = +(d['CIVFATHIGH'].replace(/,/g, ""));
                 d['COWCCODE'] = +d['COWCCODE'];
                 d['STARTYEAR'] = +d['STARTYEAR'];
-                d['ENDYEAR'] = +d['ENDYEAR'];
+
+                if (d['ENDYEAR'] !== "ONGOING") {
+                    d['ENDYEAR'] = +d['ENDYEAR'];
+                }
 
                 // assigning iso code to country
                 let key = countryCodeKey.find(o => o.cown === d.COWCCODE);

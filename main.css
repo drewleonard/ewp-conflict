@@ -51,9 +51,7 @@ body {
 .site-content {
     flex: 1 1 auto;
     position: relative;
-    /* need this to position inner content */
     overflow-y: hidden;
-    /* flex: 1; */
     display: flex;
     flex-direction: row;
 }
@@ -98,7 +96,8 @@ body {
 .information-country-year,
 .information-country-death,
 .information-country-victim,
-.information-country-region {
+.information-country-region,
+.information-country-note {
     font-size: 0.75em;
     border-top: solid #93a1a1 1px;
     margin: 0 0 5px 0;
@@ -111,7 +110,8 @@ body {
 .information-country-year-label,
 .information-country-death-label,
 .information-country-victim-label,
-.information-country-region-label {
+.information-country-region-label,
+.information-country-note-label {
     text-transform: uppercase;
     color: #93a1a1;
     flex-shrink: 1;
@@ -125,7 +125,7 @@ body {
 }
 
 .refine {
-    padding: 1em 0.75em 1em 0.75em;
+    padding: 0.50em 0.75em 0.50em 0.75em;
     border-top: solid #93a1a1 2px;
 }
 
@@ -155,7 +155,7 @@ body {
 }
 
 .legend {
-    padding: 1em 0.75em 1em 0.75em;
+    padding: 0.50em 0.75em 0.50em 0.75em;
     border-top: solid #93a1a1 2px;
     border-bottom: solid #93a1a1 2px;
 }
@@ -231,51 +231,10 @@ body {
     fill: #eee8d5;
 }
 
-.chart-button {
-    display: none;
-    display: flex;
-    flex-direction: row;
-    height: 1em;
-    font-size: 0.65em;
-    text-transform: uppercase;
-    padding: 0.25em 0 1.0em 0;
-}
-
-.button-order {
-    display: flex;
-    flex-direction: row;
-    margin: 0 50px 0 0;
-}
-
-.button-color {
-    display: flex;
-    flex-direction: row;
-}
-
-.chart-button label {
-    cursor: pointer;
-    padding: 0 5px;
-}
-
-.chart-button label:first-of-type {
-    border-right: solid 1px #586e75;
-}
-
-.chart-button label:last-of-type {
-    padding-left: 0
-}
-
 .label-selected {
     color: #268bd2;
 }
 
-.chart-button input[type="radio"] {
-    display: none
-}
-
-.chart-button input[type="checkbox"] {
-    display: none
-}
 
 .chart-bold {
     font-weight: bolder;
@@ -286,10 +245,9 @@ body {
 }
 
 .site-footer {
-    /* flex-shrink: 1; */
     flex: 0 0 auto;
-    font-size: 1em;
-    height: 1em;
+    font-size: 0.80em;
+    height: 0.80em;
     padding: 0.50em 0.75em 0.50em 0.75em;
     background: #eee8d5;
     display: flex;
