@@ -162,8 +162,17 @@ body {
     font-weight: 700;
 }
 
+.legend-wrapper,
+.legend-selector {
+    display: none;
+    font-size: 0.75em;
+}
+
+.legend-default {
+    padding: 0.50em 0 0 0em;
+}
+
 .refine-selector,
-.legend-selector,
 .statistic-selector {
     display: none;
     font-size: 0.75em;
@@ -201,7 +210,9 @@ body {
 
 .legend-region-label {
     flex: 1 1 auto;
+    /* flex-grow: 1; */
     fill: #586e75;
+    height: 140px;
 }
 
 .map {
