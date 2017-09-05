@@ -61,7 +61,7 @@ var defaultPalette = ["#586e75"],
     defaultLegend = ["All events"];
 
 var selectedPalette = ["#268bd2", "#586e75"],
-    selectedLegend = ["Selected event", "Events in country"];
+    selectedLegend = ["Selected event", "Other events in country"];
 
 var chartLegnedText = ["Deaths"];
 
