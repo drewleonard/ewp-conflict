@@ -14,19 +14,24 @@
 // SIDE BAR ON LEFT
 // Legend for order of bars
 // Change radio button hard coding
-// Resizing function
 // Merging functionality (d3.v4)
 // functionality when country does not exist?
 // height / bar number issue (think this is fixed), but check harding coding still
 // STATISTICS
 // -- how selected conflict compares to all conflicts
 // -- overall trend of conflict in the region relative to total conflict
-// -- size of conflict (i.e., duration or years) relative to other conflicts in country, region, or totally
+// -- size of conflict (i.e., duration or deaths) relative to other conflicts in country, region, or totally
 // -- -- tree map is a small option
 // -- -- better option is waffle chart
 // -- -- deaths per year on average
+// -- Wars in each region
+// -- Ongoing wars per year
 // South Sudan has 0 deaths
 // Search for a country?
+// World View
+// Legend text
+// Use Google Closure 
+// Resizing function still
 
 //////////////////////
 // GLOBAL VARIABLES //
@@ -487,6 +492,8 @@ function drawMap(countries) {
         .attr("d", path);
 }
 
+
+
 ////////////////////////
 // CENTERING FUNCTION //
 ////////////////////////
@@ -511,6 +518,21 @@ function center(id) {
                 .attr("transform", "translate(" + translate + ")scale(" + scale + ")");
 
         })
+}
+
+////////////////////
+// RESET FUNCTION //
+////////////////////
+
+function mapReset() {
+
+    d3.selectAll('.country')
+        .classed('country-over', false);
+
+    mapG.transition()
+        .duration(secondaryDuration)
+        .attr("transform", "");
+
 }
 
 ////////////////////////////
@@ -542,6 +564,8 @@ function eventRemoveHighlight() {
     $('.information-country').hide();
 
     $('.information-primary').show();
+
+    mapReset();
 
 }
 

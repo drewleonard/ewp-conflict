@@ -107,6 +107,11 @@ body {
     justify-content: space-between;
 }
 
+.information-country-note {
+    border-bottom: solid #93a1a1 1px;
+    padding-bottom: 5px;
+}
+
 .information-country-year-label,
 .information-country-death-label,
 .information-country-victim-label,
@@ -124,22 +129,29 @@ body {
     text-align: right;
 }
 
-.refine {
+.refine,
+.legend,
+.statistic {
     padding: 0.50em 0.75em 0.50em 0.75em;
     border-top: solid #93a1a1 2px;
 }
 
-.refine-button {
+.refine-button,
+.legend-button,
+.statistic-button {
     cursor: pointer;
     font-weight: 700;
 }
 
-.refine-selector {
+.refine-selector,
+.legend-selector,
+.statistic-selector {
     display: none;
     font-size: 0.75em;
 }
 
-.refine-flex-container {
+.refine-flex-container,
+.legend-flex-container {
     display: flex;
     flex-direction: row;
     padding: 0.50em 0 0 0em;
@@ -155,25 +167,10 @@ body {
 }
 
 .legend {
-    padding: 0.50em 0.75em 0.50em 0.75em;
-    border-top: solid #93a1a1 2px;
     border-bottom: solid #93a1a1 2px;
 }
 
-.legend-button {
-    cursor: pointer;
-    font-weight: 700;
-}
-
-.legend-selector {
-    display: none;
-    font-size: 0.75em;
-}
-
 .legend-flex-container {
-    display: flex;
-    flex-direction: row;
-    padding: 0.50em 0 0 0em;
     height: 120px;
 }
 
