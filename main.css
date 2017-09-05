@@ -163,13 +163,13 @@ body {
 }
 
 .legend-wrapper,
-.legend-selector {
+.legend-region {
     display: none;
     font-size: 0.75em;
 }
 
 .legend-default {
-    padding: 0.50em 0 0 0em;
+    font-size: 0.75em;
 }
 
 .refine-selector,
@@ -179,7 +179,8 @@ body {
 }
 
 .refine-flex-container,
-.legend-flex-container {
+.legend-region-flex,
+.legend-default-flex {
     display: flex;
     flex-direction: row;
     padding: 0.50em 0 0 0em;
@@ -198,7 +199,7 @@ body {
     border-bottom: solid #93a1a1 2px;
 }
 
-.legend-flex-container {
+.legend-region-flex {
     height: 140px;
 }
 
@@ -210,9 +211,20 @@ body {
 
 .legend-region-label {
     flex: 1 1 auto;
-    /* flex-grow: 1; */
     fill: #586e75;
     height: 140px;
+}
+
+.legend-default-color {
+    width: 11px;
+    height: 70px;
+    padding-right: 0.50em;
+}
+
+.legend-default-label {
+    flex: 1 1 auto;
+    fill: #586e75;
+    height: 70px;
 }
 
 .map {

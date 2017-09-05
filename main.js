@@ -3,7 +3,7 @@
 //////////
 
 // TODAY
-// add solarized color to selected bar
+// add regionPalette color to selected bar
 // -- forward functionality (i.e., bar clicking behavior)
 // -- reverse functionality (i.e., using map to filter, etc.)
 // -- Check which countries don't work
@@ -21,7 +21,7 @@
 // -- how selected conflict compares to all conflicts
 // -- overall trend of conflict in the region relative to total conflict
 // -- size of conflict (i.e., duration or deaths) relative to other conflicts in country, region, or totally
-// -- -- tree map is a small option
+// -- -- tree map is a small option #586e75
 // -- -- better option is waffle chart
 // -- -- deaths per year on average
 // -- Wars in each region
@@ -32,6 +32,7 @@
 // Legend text
 // Use Google Closure 
 // Resizing function still
+// defaultPalette / find way of getting css
 
 //////////////////////
 // GLOBAL VARIABLES //
@@ -50,11 +51,16 @@ var formatComma = d3.format(',');
 
 var region, colorScale;
 
-var solarized = [
+var regionPalette = [
     "#6c71c4", "#b58900",
     "#dc322f", "#2aa198",
     "#859900", "#268bd2"
 ];
+
+var defaultPalette = ["#586e75", "#268bd2"],
+    defaultLegend = ["All", "Selected"];
+
+console.log(defaultPalette)
 
 var chartLegnedText = ["Deaths"];
 
@@ -75,6 +81,14 @@ var legendChart = d3.select('.chart-legend')
 var map = d3.select('.map')
     .append('svg')
     .attr('id', 'map');
+
+var legendDefaultColor = d3.select('.legend-default-color')
+    .append('svg')
+    .attr('id', 'legendDefaultColor');
+
+var legendDefaultLabel = d3.select('.legend-default-label')
+    .append('svg')
+    .attr('id', 'legendDefaultLabel');
 
 var legendRegionColor = d3.select('.legend-region-color')
     .append('svg')
@@ -356,8 +370,8 @@ function orderByDate() {
 
 function colorByRegion() {
 
-    $('.legend-selector').toggle();
-    $('.legend-default').toggle();
+    $('.legend-region').slideToggle();
+    $('.legend-default').slideToggle();
 
     chartMain.selectAll('.event')
         .transition()
@@ -370,8 +384,8 @@ function colorByRegion() {
 
 function removeColor() {
 
-    $('.legend-selector').toggle();
-    $('.legend-default').toggle();
+    $('.legend-region').slideToggle();
+    $('.legend-default').slideToggle();
 
     chartMain.selectAll('.event')
         .transition()
@@ -381,8 +395,97 @@ function removeColor() {
 }
 
 //////////////////////////////
-// LEGEND DRAWING FUNCTIONS //
+// LEGEND DEFAULT FUNCTIONS //
 //////////////////////////////
+
+function drawLegendDefaultColor() {
+
+    ////////////////
+    // DIMENSIONS //
+    ////////////////
+
+    var w = parseInt($('.legend-default-color').css('width')),
+        h = parseInt($('.legend-default-color').css('height'));
+
+    legendDefaultColor
+        .attr('width', w)
+        .attr('height', h)
+
+    //////////////////////////
+    // STEP AND POSITIONING //
+    //////////////////////////
+
+    var numBoxes = defaultPalette.length,
+        numSpaces = numBoxes - 1,
+        boxesH = w * (numBoxes + numSpaces),
+        step = (h - boxesH) / 2;
+
+    ////////////////////////////
+    // DRAWING LEGEND SQAURES //
+    ////////////////////////////
+
+    legendDefaultColor.selectAll('.square')
+        .data(defaultPalette)
+        .enter()
+        .append('rect')
+        .attr('class', 'square')
+        .attr('x', 0)
+        .attr('y', function(d, i) {
+            return step + (i * w * 2)
+        })
+        .attr('width', w)
+        .attr('height', w)
+        .attr('fill', function(d) {
+            return d;
+        });
+}
+
+function drawLegendDefaultLabel() {
+
+    ////////////////
+    // DIMENSIONS //
+    ////////////////
+
+    var w = parseInt($('.legend').css('width')),
+        h = parseInt($('.legend-default-label').css('height')),
+        squareW = parseInt($('.legend-default-color').css('width'));
+
+    legendDefaultLabel
+        .attr('width', w)
+        .attr('height', h);
+
+    //////////////////////////
+    // STEP AND POSITIONING //
+    //////////////////////////
+
+    var numBoxes = defaultLegend.length,
+        numSpaces = numBoxes - 1,
+        boxesH = squareW * (numBoxes + numSpaces),
+        step = (h - boxesH) / 2;
+
+    ///////////////////////////
+    // DRAWING LEGEND LABELS //
+    ///////////////////////////
+
+    legendDefaultLabel.selectAll('.label')
+        .data(defaultLegend)
+        .enter()
+        .append('text')
+        .attr('class', 'label')
+        .attr('x', 0)
+        .attr('y', function(d, i) {
+            return step + squareW + (i * squareW * 2)
+        })
+        .text(function(d) {
+            console.log(d);
+            return d;
+        })
+
+}
+
+/////////////////////////////
+// LEGEND REGION FUNCTIONS //
+/////////////////////////////
 
 function drawLegendRegionColor() {
 
@@ -401,7 +504,7 @@ function drawLegendRegionColor() {
     // STEP AND POSITIONING //
     //////////////////////////
 
-    var numBoxes = solarized.length,
+    var numBoxes = regionPalette.length,
         numSpaces = numBoxes - 1,
         boxesH = w * (numBoxes + numSpaces),
         step = (h - boxesH) / 2;
@@ -411,13 +514,12 @@ function drawLegendRegionColor() {
     ////////////////////////////
 
     legendRegionColor.selectAll('.square')
-        .data(solarized)
+        .data(regionPalette)
         .enter()
         .append('rect')
         .attr('class', 'square')
         .attr('x', 0)
         .attr('y', function(d, i) {
-            // console.log(step + (i * w * 2));
             return step + (i * w * 2)
         })
         .attr('width', w)
@@ -436,7 +538,7 @@ function drawLegendRegionLabel() {
 
     var w = parseInt($('.legend').css('width')),
         h = parseInt($('.legend-region-label').css('height')),
-        squareW = 11;
+        squareW = parseInt($('.legend-region-color').css('width'));
 
     legendRegionLabel
         .attr('width', w)
@@ -460,7 +562,7 @@ function drawLegendRegionLabel() {
         .enter()
         .append('text')
         .attr('class', 'label')
-        // .attr('x', 0)
+        .attr('x', 0)
         .attr('y', function(d, i) {
             return step + squareW + (i * squareW * 2)
         })
@@ -469,7 +571,9 @@ function drawLegendRegionLabel() {
         })
 }
 
-function drawLegendRegion() {
+function drawLegend() {
+    drawLegendDefaultColor();
+    drawLegendDefaultLabel();
     drawLegendRegionColor();
     drawLegendRegionLabel();
 }
@@ -824,8 +928,6 @@ function legendToggle() {
     // toggle legend up or down
     $('.legend-wrapper').slideToggle();
 
-    // drawLegendRegion();
-
 }
 
 /////////////////
@@ -881,7 +983,7 @@ d3.queue()
             // color scale
             colorScale = d3.scaleOrdinal()
                 .domain(region)
-                .range(solarized);
+                .range(regionPalette);
 
             //////////////////////
             // COUNTRY CODE KEY //
@@ -922,7 +1024,7 @@ d3.queue()
             orderByDeath();
             drawMap(countries);
             interaction(conflicts);
-            drawLegendRegion();
+            drawLegend();
 
         }
     });
