@@ -1156,7 +1156,7 @@ d3.queue()
                 }
 
                 // assigning iso code to country
-                let key = countryCodeKey.find(o => o.cown === d.COWCCODE);
+                var key = countryCodeKey.find(o => o.cown === d.COWCCODE);
                 if (key !== undefined) {
                     d['ISOCODE'] = key.iso3n;
                 }
