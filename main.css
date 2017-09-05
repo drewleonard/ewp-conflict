@@ -115,7 +115,10 @@ body {
     padding-bottom: 5px;
 }
 
-.information-country-note {
+.information-country-note,
+.refine-button-container,
+.legend-button-container,
+.statistic-button-container {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -360,9 +363,4 @@ body {
 .details-arrow:hover {
     fill: #268bd2;
     cursor: pointer;
-    /*     transition:   1s; */
-}
-
-.arrow-rotate {
-    /* transform: rotate(-180deg); */
 }

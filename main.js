@@ -747,14 +747,14 @@ function interaction(conflicts) {
     // DETAILS BUTTON //
     ////////////////////
 
-    d3.select('.details-arrow')
+    d3.select('#details-arrow')
         .on('click', detailsArrowToggle);
 
     ///////////////////
     // REFINE BUTTON //
     ///////////////////
 
-    d3.select('.refine-button')
+    d3.select('#refine-arrow')
         .on('click', refineToggle);
 
     d3.selectAll('.refine-order')
@@ -764,7 +764,7 @@ function interaction(conflicts) {
     // LEGEND BUTTON //
     ///////////////////
 
-    d3.select('.legend-button')
+    d3.select('#legend-arrow')
         .on('click', legendToggle);
 
     /////////////////////
