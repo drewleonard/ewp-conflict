@@ -163,6 +163,7 @@ body {
 }
 
 .legend-wrapper,
+.legend-selected,
 .legend-region {
     display: none;
     font-size: 0.75em;
@@ -179,8 +180,9 @@ body {
 }
 
 .refine-flex-container,
-.legend-region-flex,
-.legend-default-flex {
+.legend-default-flex,
+.legend-selected-flex,
+.legend-region-flex {
     display: flex;
     flex-direction: row;
     padding: 0.50em 0 0 0em;
@@ -199,9 +201,34 @@ body {
     border-bottom: solid #93a1a1 2px;
 }
 
-.legend-region-flex {
-    height: 140px;
+.legend-default-color {
+    width: 11px;
+    height: 30px;
+    padding-right: 0.50em;
 }
+
+.legend-default-label {
+    flex: 1 1 auto;
+    fill: #586e75;
+    height: 30px;
+}
+
+.legend-selected-color {
+    width: 11px;
+    height: 50px;
+    padding-right: 0.50em;
+}
+
+.legend-selected-label {
+    flex: 1 1 auto;
+    fill: #586e75;
+    height: 50px;
+}
+
+
+/* .legend-region-flex {
+    height: 140px;
+} */
 
 .legend-region-color {
     width: 11px;
@@ -213,18 +240,6 @@ body {
     flex: 1 1 auto;
     fill: #586e75;
     height: 140px;
-}
-
-.legend-default-color {
-    width: 11px;
-    height: 70px;
-    padding-right: 0.50em;
-}
-
-.legend-default-label {
-    flex: 1 1 auto;
-    fill: #586e75;
-    height: 70px;
 }
 
 .map {

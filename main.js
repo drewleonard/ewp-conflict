@@ -57,14 +57,34 @@ var regionPalette = [
     "#859900", "#268bd2"
 ];
 
-var defaultPalette = ["#586e75", "#268bd2"],
-    defaultLegend = ["All", "Selected"];
+var defaultPalette = ["#586e75"],
+    defaultLegend = ["All events"];
 
-console.log(defaultPalette)
+var selectedPalette = ["#268bd2", "#586e75"],
+    selectedLegend = ["Selected event", "Events in country"];
 
 var chartLegnedText = ["Deaths"];
 
-var drawn = false;
+var coloredByRegion = false,
+    eventSelected = false;
+
+var legendCases = {
+    default: function() {
+        $('.legend-region').slideUp();
+        $('.legend-default').slideDown();
+        $('.legend-selected').slideUp();
+    },
+    selected: function() {
+        $('.legend-region').slideUp();
+        $('.legend-default').slideUp();
+        $('.legend-selected').slideDown();
+    },
+    region: function() {
+        $('.legend-region').slideDown();
+        $('.legend-default').slideUp();
+        $('.legend-selected').slideUp();
+    }
+}
 
 /////////////////////////////////
 // SVG AND OTHER PAGE ELEMENTS //
@@ -89,6 +109,14 @@ var legendDefaultColor = d3.select('.legend-default-color')
 var legendDefaultLabel = d3.select('.legend-default-label')
     .append('svg')
     .attr('id', 'legendDefaultLabel');
+
+var legendSelectedLabel = d3.select('.legend-selected-label')
+    .append('svg')
+    .attr('id', 'legendSelectedLabel');
+
+var legendSelectedColor = d3.select('.legend-selected-color')
+    .append('svg')
+    .attr('id', 'legendSelectedColor');
 
 var legendRegionColor = d3.select('.legend-region-color')
     .append('svg')
@@ -370,9 +398,11 @@ function orderByDate() {
 
 function colorByRegion() {
 
-    $('.legend-region').slideToggle();
-    $('.legend-default').slideToggle();
+    // legend settings
+    coloredByRegion = true;
+    legendCases.region();
 
+    // set each event fill by country
     chartMain.selectAll('.event')
         .transition()
         .duration(secondaryDuration)
@@ -384,8 +414,15 @@ function colorByRegion() {
 
 function removeColor() {
 
-    $('.legend-region').slideToggle();
-    $('.legend-default').slideToggle();
+    // legend settings
+    coloredByRegion = false;
+
+    if (eventSelected === false) {
+        legendCases.default();
+    } else {
+        legendCases.selected();
+    }
+
 
     chartMain.selectAll('.event')
         .transition()
@@ -477,10 +514,95 @@ function drawLegendDefaultLabel() {
             return step + squareW + (i * squareW * 2)
         })
         .text(function(d) {
-            console.log(d);
             return d;
         })
+}
 
+///////////////////////////////
+// LEGEND SELECTED FUNCTIONS //
+///////////////////////////////
+
+function drawLegendSelectedColor() {
+
+    ////////////////
+    // DIMENSIONS //
+    ////////////////
+
+    var w = parseInt($('.legend-selected-color').css('width')),
+        h = parseInt($('.legend-selected-color').css('height'));
+
+    legendSelectedColor
+        .attr('width', w)
+        .attr('height', h);
+
+    //////////////////////////
+    // STEP AND POSITIONING //
+    //////////////////////////
+
+    var numBoxes = selectedPalette.length,
+        numSpaces = numBoxes - 1,
+        boxesH = w * (numBoxes + numSpaces),
+        step = (h - boxesH) / 2;
+
+    ////////////////////////////
+    // DRAWING LEGEND SQAURES //
+    ////////////////////////////
+
+    legendSelectedColor.selectAll('.square')
+        .data(selectedPalette)
+        .enter()
+        .append('rect')
+        .attr('class', 'square')
+        .attr('x', 0)
+        .attr('y', function(d, i) {
+            return step + (i * w * 2)
+        })
+        .attr('width', w)
+        .attr('height', w)
+        .attr('fill', function(d) {
+            return d;
+        });
+}
+
+function drawLegendSelectedLabel() {
+
+    ////////////////
+    // DIMENSIONS //
+    ////////////////
+
+    var w = parseInt($('.legend').css('width')),
+        h = parseInt($('.legend-selected-label').css('height')),
+        squareW = parseInt($('.legend-selected-color').css('width'));
+
+    legendSelectedLabel
+        .attr('width', w)
+        .attr('height', h);
+
+    //////////////////////////
+    // STEP AND POSITIONING //
+    //////////////////////////
+
+    var numBoxes = selectedLegend.length,
+        numSpaces = numBoxes - 1,
+        boxesH = squareW * (numBoxes + numSpaces),
+        step = (h - boxesH) / 2;
+
+    ///////////////////////////
+    // DRAWING LEGEND LABELS //
+    ///////////////////////////
+
+    legendSelectedLabel.selectAll('.label')
+        .data(selectedLegend)
+        .enter()
+        .append('text')
+        .attr('class', 'label')
+        .attr('x', 0)
+        .attr('y', function(d, i) {
+            return step + squareW + (i * squareW * 2)
+        })
+        .text(function(d) {
+            return d;
+        })
 }
 
 /////////////////////////////
@@ -527,7 +649,6 @@ function drawLegendRegionColor() {
         .attr('fill', function(d) {
             return d;
         });
-
 }
 
 function drawLegendRegionLabel() {
@@ -574,6 +695,8 @@ function drawLegendRegionLabel() {
 function drawLegend() {
     drawLegendDefaultColor();
     drawLegendDefaultLabel();
+    drawLegendSelectedColor();
+    drawLegendSelectedLabel();
     drawLegendRegionColor();
     drawLegendRegionLabel();
 }
@@ -800,6 +923,12 @@ function eventMouseOut(d) {
 
 function eventClick(d) {
 
+    // legend settings
+    eventSelected = true;
+    if (coloredByRegion === false) {
+        legendCases.selected();
+    }
+
     // record selected event
     selectedEvent = this;
 
@@ -885,6 +1014,20 @@ function interaction(conflicts) {
 
     document.getElementById('chart-main').onclick = function(e) {
         if (!e.target.hasAttribute('class', 'event')) {
+
+            // toggling legend
+            eventSelected = false;
+
+            if (coloredByRegion === false) {
+                $('.legend-region').slideUp();
+                $('.legend-default').slideDown();
+                $('.legend-selected').slideUp();
+            } else {
+                $('.legend-region').slideDown();
+                $('.legend-default').slideUp();
+                $('.legend-selected').slideUp();
+            }
+
             eventRemoveHighlight();
         }
     }
@@ -1023,8 +1166,8 @@ d3.queue()
             drawPrimaryChart(conflicts);
             orderByDeath();
             drawMap(countries);
-            interaction(conflicts);
             drawLegend();
+            interaction(conflicts);
 
         }
     });
