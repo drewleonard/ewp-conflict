@@ -187,12 +187,12 @@ body {
 }
 
 .legend-flex-container {
-    height: 120px;
+    height: 140px;
 }
 
 .legend-region-color {
     width: 11px;
-    height: 120px;
+    height: 140px;
     padding-right: 0.50em;
 }
 
