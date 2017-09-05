@@ -171,12 +171,12 @@ body {
 }
 
 .legend-flex-container {
-    height: 120px;
+    height: 110px;
 }
 
 .legend-region-color {
     width: 10px;
-    height: 120px;
+    height: 110px;
     padding-right: 0.50em;
 }
 
@@ -332,4 +332,11 @@ body {
     margin: 0;
     padding: 0;
     font-size: 0.90em;
+}
+
+.downarrow {
+    width: 1em;
+    height: 1em;
+    fill: #586e75;
+    margin-right: 5px;
 }

@@ -359,16 +359,17 @@ function colorByRegion() {
         .duration(secondaryDuration)
         .style('fill', function(d) {
             return colorScale(d.REGION);
-        })
+        });
 
-    legendToggle();
 }
 
 function removeColor() {
+
     chartMain.selectAll('.event')
         .transition()
         .duration(secondaryDuration)
         .style('fill', null);
+
 }
 
 //////////////////////////////
@@ -781,7 +782,7 @@ function legendToggle() {
     // toggle legend up or down
     $('.legend-selector').slideToggle();
 
-    // draw legend because we calculate dimensions dynamically
+    // draw legend
     drawLegendRegion();
 }
 
@@ -877,7 +878,6 @@ d3.queue()
 
             drawPrimaryChart(conflicts);
             orderByDeath();
-            drawLegendRegion();
             drawMap(countries);
             interaction(conflicts);
 
