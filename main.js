@@ -385,11 +385,20 @@ function drawLegendRegionColor() {
     var w = parseInt($('.legend-region-color').css('width')),
         h = parseInt($('.legend-region-color').css('height'));
 
-    var step = w / 2;
-
     legendRegionColor
         .attr('width', w)
         .attr('height', h);
+
+    //////////////////////////
+    // STEP AND POSITIONING //
+    //////////////////////////
+
+    var numBoxes = 6,
+        numSpaces = numBoxes - 1,
+        boxesH = w * (numBoxes + numSpaces),
+        step = (h - boxesH) / 2;
+
+    // var step = w / 2;
 
     ////////////////////////////
     // DRAWING LEGEND SQAURES //
@@ -421,11 +430,18 @@ function drawLegendRegionLabel() {
         h = parseInt($('.legend-region-label').css('height')),
         squareW = parseInt($('.legend-region-color').css('width'));
 
-    var step = squareW / 2;
-
     legendRegionLabel
         .attr('width', w)
         .attr('height', h);
+
+    //////////////////////////
+    // STEP AND POSITIONING //
+    //////////////////////////
+
+    var numBoxes = 6,
+        numSpaces = numBoxes - 1,
+        boxesH = squareW * (numBoxes + numSpaces),
+        step = (h - boxesH) / 2;
 
     ///////////////////////////
     // DRAWING LEGEND LABELS //
