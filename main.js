@@ -600,8 +600,10 @@ function addInformation(d) {
             } else {
                 return d.REGION
             }
-
         });
+
+    d3.select('.information-country-note-value')
+        .html(d.LONGDESCRIPTION);
 
     // adding information
     $('.information-country').show();
@@ -725,6 +727,13 @@ function interaction(conflicts) {
         .on('mouseout', eventMouseOut)
         .on('click', eventClick);
 
+    ////////////////////
+    // DETAILS BUTTON //
+    ////////////////////
+
+    d3.select('.details-arrow')
+        .on('click', detailsArrowToggle);
+
     ///////////////////
     // REFINE BUTTON //
     ///////////////////
@@ -752,6 +761,15 @@ function interaction(conflicts) {
         }
     }
 
+}
+
+///////////////////////
+// DETAILS FUNCTIONS //
+///////////////////////
+
+function detailsArrowToggle() {
+    // toggle long description
+    $('.information-country-note-value').slideToggle();
 }
 
 //////////////////////

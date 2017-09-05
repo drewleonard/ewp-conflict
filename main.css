@@ -96,8 +96,7 @@ body {
 .information-country-year,
 .information-country-death,
 .information-country-victim,
-.information-country-region,
-.information-country-note {
+.information-country-region {
     font-size: 0.75em;
     border-top: solid #93a1a1 1px;
     margin: 0 0 5px 0;
@@ -107,9 +106,26 @@ body {
     justify-content: space-between;
 }
 
-.information-country-note {
+.information-country-note-container {
+    font-size: 0.75em;
+    border-top: solid #93a1a1 1px;
+    margin: 0 0 5px 0;
+    padding: 5px 0 0 0;
     border-bottom: solid #93a1a1 1px;
     padding-bottom: 5px;
+}
+
+.information-country-note {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+
+.information-country-note-value {
+    display: none;
+    font-size: 0.80em;
+    margin: 0.50em 0 0.50em 0;
 }
 
 .information-country-year-label,
@@ -334,9 +350,19 @@ body {
     font-size: 0.90em;
 }
 
-.downarrow {
+.details-arrow {
     width: 1em;
     height: 1em;
     fill: #586e75;
     margin-right: 5px;
+}
+
+.details-arrow:hover {
+    fill: #268bd2;
+    cursor: pointer;
+    /*     transition:   1s; */
+}
+
+.arrow-rotate {
+    /* transform: rotate(-180deg); */
 }
