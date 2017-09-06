@@ -228,6 +228,7 @@ body {
 
 
 
+
 /* .legend-region-flex {
     height: 140px;
 } */
@@ -247,6 +248,11 @@ body {
 .map {
     height: 200px;
     border-bottom: solid #93a1a1 2px;
+}
+
+.map-background {
+    fill: none;
+    pointer-events: all;
 }
 
 .country {

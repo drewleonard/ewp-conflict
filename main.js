@@ -86,6 +86,8 @@ var legendCases = {
     }
 }
 
+var conflictstest;
+
 /////////////////////////////////
 // SVG AND OTHER PAGE ELEMENTS //
 /////////////////////////////////
@@ -718,6 +720,12 @@ function drawMap(countries) {
         .attr('width', mapW)
         .attr('height', mapH);
 
+    map.append("rect")
+        .attr("class", "map-background")
+        .attr("width", mapW)
+        .attr("height", mapH)
+        .on("click", mapReset);
+
     mapG = map.append('g');
 
     ////////////
@@ -746,28 +754,23 @@ function drawMap(countries) {
         .insert("path", ".graticule")
         .attr("class", "country")
         .attr("id", function(d) { return '_map_' + parseInt(d.id); })
-        .attr("d", path);
+        .attr("d", path)
+        .on('click', countryClickZoom);
 }
 
+///////////////////////////////////
+// MAP ZOOM AND CENTER FUNCTIONS //
+///////////////////////////////////
 
-function zoomed() {
+function eventClickZoom(id) {
 
-    var transform = d3.event.transform;
+    // remove any colored countries
+    d3.selectAll('.country')
+        .classed('country-over', false);
 
-    transform.x = d3.min([transform.x, 0]);
-    transform.y = d3.min([transform.y, 0]);
-    transform.x = d3.max([transform.x, (1 - transform.k) * mapW]);
-    transform.y = d3.max([transform.y, (1 - transform.k) * mapH]);
-
-    mapG.attr("transform", transform);
-
-}
-
-////////////////////////
-// CENTERING FUNCTION //
-////////////////////////
-
-function mapCenter(id) {
+    // color newly selected country
+    d3.select(id)
+        .classed('country-over', true);
 
     d3.select(id)
         .call(function(d) {
@@ -789,6 +792,75 @@ function mapCenter(id) {
         })
 }
 
+function countryClickZoom(d) {
+
+    // remove any colored countries
+    d3.selectAll('.country')
+        .classed('country-over', false);
+
+    // color newly selected country
+    d3.select(this)
+        .classed('country-over', true);
+
+    // finding events of selected country
+    var arr = conflicts.filter(function(e) {
+        return e.ISOCODE == Number(d.id);
+    });
+
+    if (arr.length > 0) {
+
+        d3.selectAll('.event')
+            .transition()
+            .duration(secondaryDuration)
+            .style('opacity', function(d) {
+
+                function findCountry(id) {
+                    return arr.some(function(el) {
+                        return el.ISOCODE === id;
+                    });
+                }
+
+                if (findCountry(d.ISOCODE) !== true) {
+                    return eventOpacity;
+                }
+            });
+
+    } else {
+
+        d3.selectAll('.event')
+            .transition()
+            .duration(secondaryDuration)
+            .style('opacity', null);
+
+    }
+
+    var bounds = path.bounds(d),
+        dx = bounds[1][0] - bounds[0][0],
+        dy = bounds[1][1] - bounds[0][1],
+        x = (bounds[0][0] + bounds[1][0]) / 2,
+        y = (bounds[0][1] + bounds[1][1]) / 2,
+        scale = Math.max(1, Math.min(8, 0.9 / Math.max(dx / mapW, dy / mapH))),
+        translate = [mapW / 2 - scale * x, mapH / 2 - scale * y];
+
+    map.transition()
+        .duration(primaryDuration)
+        .call(zoom.transform, d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale));
+
+}
+
+function zoomed() {
+
+    var transform = d3.event.transform;
+
+    transform.x = d3.min([transform.x, 0]);
+    transform.y = d3.min([transform.y, 0]);
+    transform.x = d3.max([transform.x, (1 - transform.k) * mapW]);
+    transform.y = d3.max([transform.y, (1 - transform.k) * mapH]);
+
+    mapG.attr("transform", transform);
+
+}
+
 ////////////////////
 // RESET FUNCTION //
 ////////////////////
@@ -797,6 +869,11 @@ function mapReset() {
 
     d3.selectAll('.country')
         .classed('country-over', false);
+
+    d3.selectAll('.event')
+        .transition()
+        .duration(primaryDuration)
+        .style('opacity', null);
 
     map.transition()
         .duration(primaryDuration)
@@ -953,19 +1030,10 @@ function eventClick(d) {
     var mapId = '#_map_' + d.ISOCODE,
         chartId = '#_chart_' + d.ISOCODE;
 
-    // remove any colored countries
-    d3.selectAll('.country')
-        .classed('country-over', false);
-
-
     try {
 
-        // color newly selected country
-        d3.select(mapId)
-            .classed('country-over', true);
-
         // center map on newly selected country
-        mapCenter(mapId);
+        eventClickZoom(mapId);
 
     } catch (TypeError) {
 
@@ -1108,7 +1176,7 @@ d3.queue()
     .defer(d3.csv, countryCodeKey)
     .defer(d3.json, topojsonMap)
     .defer(d3.json, countryJson)
-    .await(function(error, conflicts, countryCodeKey, world, countryJson) {
+    .await(function(error, conflictsProcessed, countryCodeKey, world, countryJson) {
 
         if (error) {
 
@@ -1117,6 +1185,7 @@ d3.queue()
         } else {
 
             // Data processing tasks we want to do once only
+
 
             //////////////
             // MAP DATA //
@@ -1137,7 +1206,7 @@ d3.queue()
             /////////////////
 
             // get unique region values
-            region = conflicts.map(function(obj) { return obj.REGION; });
+            region = conflictsProcessed.map(function(obj) { return obj.REGION; });
             region = region.filter(function(v, i) { return region.indexOf(v) == i; });
 
             // color scale
@@ -1159,7 +1228,7 @@ d3.queue()
             // CONFLICTS DATA //
             ////////////////////
 
-            conflicts.forEach(function(d) {
+            conflictsProcessed.forEach(function(d) {
 
                 // forcing strings to integers
                 d['AVGFAT'] = +(d['AVGFAT'].replace(/,/g, ""));
@@ -1180,11 +1249,14 @@ d3.queue()
 
             });
 
-            drawPrimaryChart(conflicts);
+            // setting global conflicts variable to processed conflicts data
+            conflicts = conflictsProcessed;
+
+            drawPrimaryChart(conflictsProcessed);
             orderByDeath();
             drawMap(countries);
             drawLegend();
-            interaction(conflicts);
+            interaction(conflictsProcessed);
 
         }
     });
