@@ -45,7 +45,7 @@ var eventOpacity = 0.20;
 
 var selectedEvent;
 
-var countries, mapW, mapH, mapG, path, projection;
+var countries, mapW, mapH, mapG, path, projection, zoom;
 
 var formatComma = d3.format(',');
 
@@ -730,10 +730,15 @@ function drawMap(countries) {
 
     path = d3.geoPath().projection(projection);
 
+    zoom = d3.zoom()
+        .scaleExtent([1, 8])
+        .on("zoom", zoomed);
+
+    map.call(zoom);
+
     /////////////////
     // DRAWING MAP //
     /////////////////
-
 
     mapG.selectAll(".country")
         .data(countries)
@@ -745,12 +750,24 @@ function drawMap(countries) {
 }
 
 
+function zoomed() {
+
+    var transform = d3.event.transform;
+
+    transform.x = d3.min([transform.x, 0]);
+    transform.y = d3.min([transform.y, 0]);
+    transform.x = d3.max([transform.x, (1 - transform.k) * mapW]);
+    transform.y = d3.max([transform.y, (1 - transform.k) * mapH]);
+
+    mapG.attr("transform", transform);
+
+}
 
 ////////////////////////
 // CENTERING FUNCTION //
 ////////////////////////
 
-function center(id) {
+function mapCenter(id) {
 
     d3.select(id)
         .call(function(d) {
@@ -765,9 +782,9 @@ function center(id) {
                 translate = [mapW / 2 - scale * x, mapH / 2 - scale * y];
 
             // translate and set new scale for map
-            mapG.transition()
-                .duration(secondaryDuration)
-                .attr("transform", "translate(" + translate + ")scale(" + scale + ")");
+            map.transition()
+                .duration(primaryDuration)
+                .call(zoom.transform, d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale));
 
         })
 }
@@ -781,9 +798,9 @@ function mapReset() {
     d3.selectAll('.country')
         .classed('country-over', false);
 
-    mapG.transition()
-        .duration(secondaryDuration)
-        .attr("transform", "");
+    map.transition()
+        .duration(primaryDuration)
+        .call(zoom.transform, d3.zoomIdentity);
 
 }
 
@@ -948,7 +965,7 @@ function eventClick(d) {
             .classed('country-over', true);
 
         // center map on newly selected country
-        center(mapId);
+        mapCenter(mapId);
 
     } catch (TypeError) {
 
