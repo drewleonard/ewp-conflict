@@ -24,7 +24,6 @@ body {
 
 
 
-
 /* This is wrong --- test */
 
 .body {
@@ -85,12 +84,14 @@ body {
     padding-bottom: 1em;
 }
 
-.information-country {
+.information-country,
+.information-country-click {
     display: none;
     font-size: 1em;
 }
 
-.information-country-country {
+.information-country-country,
+.information-country-click-country {
     font-size: 1em;
     font-weight: 700;
     padding: 0 0 20px 0;
@@ -100,6 +101,17 @@ body {
     font-size: 0.60em;
     color: #93a1a1;
     margin: 0 0 20px 0;
+}
+
+.information-country-click-instructions {
+    font-size: 0.70em;
+    color: #93a1a1;
+}
+
+.information-country-click-emphasis {
+    font-weight: 700;
+    color: #586e75;
+    font-size: 1.20em;
 }
 
 .information-country-year,
@@ -233,6 +245,14 @@ body {
     fill: #586e75;
     height: 50px;
 }
+
+
+
+
+
+
+
+
 
 
 

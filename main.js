@@ -63,7 +63,7 @@ var defaultPalette = ["#586e75"],
 var selectedPalette = ["#268bd2", "#586e75"],
     selectedLegend = ["Selected event", "Other events in country"];
 
-var chartLegnedText = ["Deaths"];
+var chartLegendText = ["Deaths"];
 
 var coloredByRegion = false,
     eventSelected = false;
@@ -350,7 +350,7 @@ function orderByDeath() {
             return yScale(i);
         });
 
-    chartLegnedText = ["Deaths"];
+    chartLegendText = ["Deaths"];
     drawlegendChartText(["Deaths"]);
 
 }
@@ -387,7 +387,7 @@ function orderByDate() {
             return yScale(i);
         });
 
-    chartLegnedText = ["Year"];
+    chartLegendText = ["Year"];
     drawlegendChartText(["Year"]);
 
 }
@@ -805,13 +805,11 @@ function countryClickZoom(d) {
         return e.ISOCODE === Number(d.id);
     });
 
-    console.log(d);
-
-    // add initial information to sidebar
-    // d3.select('.information-country-click-country')
-    //     .html(d.COUNTRY);
-
     if (arr.length > 0) {
+
+        var description = 'This country has ' + '<span class="information-country-click-emphasis">' + arr.length + '</span>' +
+            ' episode(s) of political repression included in this dataset. ' +
+            'Episodes are highlighted to the right.'
 
         d3.selectAll('.event')
             .transition()
@@ -831,12 +829,33 @@ function countryClickZoom(d) {
 
     } else {
 
+        var description = 'This country has ' + '<strong>' + arr.length + '</strong>' +
+            ' episodes of political repression included in this dataset.'
+
         d3.selectAll('.event')
             .transition()
             .duration(secondaryDuration)
             .style('opacity', null);
 
     }
+
+    /////////////////////////
+    // SIDEBAR INFORMATION //
+    /////////////////////////
+
+    // add initial information to sidebar
+    d3.select('.information-country-click-country')
+        .html(d.name);
+
+    d3.select('.information-country-click-instructions')
+        .html(description);
+
+    var targetDiv = $('.information-country-click');
+    resetInformation(targetDiv);
+
+    ////////////////////////
+    // MAP TRANSFORMATION //
+    ////////////////////////
 
     var bounds = path.bounds(d),
         dx = bounds[1][0] - bounds[0][0],
@@ -869,6 +888,15 @@ function zoomed() {
 // RESET FUNCTION //
 ////////////////////
 
+function resetInformation(targetDiv) {
+
+    $('.information').children('.information-child').each(function() {
+        $(this).hide();
+    });
+
+    targetDiv.show();
+}
+
 function mapReset() {
 
     d3.selectAll('.country')
@@ -878,6 +906,12 @@ function mapReset() {
         .transition()
         .duration(primaryDuration)
         .style('opacity', null);
+
+    d3.selectAll('.event')
+        .classed('event-over', false);
+
+    var targetDiv = $('.information-primary');
+    resetInformation(targetDiv);
 
     map.transition()
         .duration(primaryDuration)
@@ -911,9 +945,8 @@ function eventRemoveHighlight() {
     d3.selectAll('.event')
         .classed('event-over', false);
 
-    $('.information-country').hide();
-
-    $('.information-primary').show();
+    var targetDiv = $('.information-primary');
+    resetInformation(targetDiv);
 
     mapReset();
 
@@ -924,9 +957,6 @@ function eventRemoveHighlight() {
 ////////////////////////
 
 function addInformation(d) {
-
-    // filermoving primary information
-    $('.information-primary').hide();
 
     // updating information
     d3.select('.information-country-country')
@@ -954,8 +984,8 @@ function addInformation(d) {
     d3.select('.information-country-note-value')
         .html(d.LONGDESCRIPTION);
 
-    // adding information
-    $('.information-country').show();
+    var targetDiv = $('.information-country');
+    resetInformation(targetDiv);
 
 }
 
@@ -1108,13 +1138,9 @@ function interaction(conflicts) {
             eventSelected = false;
 
             if (coloredByRegion === false) {
-                $('.legend-region').slideUp();
-                $('.legend-default').slideDown();
-                $('.legend-selected').slideUp();
+                legendCases.default();
             } else {
-                $('.legend-region').slideDown();
-                $('.legend-default').slideUp();
-                $('.legend-selected').slideUp();
+                legendCases.region();
             }
 
             eventRemoveHighlight();
