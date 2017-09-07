@@ -86,8 +86,6 @@ var legendCases = {
     }
 }
 
-var conflictstest;
-
 /////////////////////////////////
 // SVG AND OTHER PAGE ELEMENTS //
 /////////////////////////////////
@@ -804,8 +802,14 @@ function countryClickZoom(d) {
 
     // finding events of selected country
     var arr = conflicts.filter(function(e) {
-        return e.ISOCODE == Number(d.id);
+        return e.ISOCODE === Number(d.id);
     });
+
+    console.log(d);
+
+    // add initial information to sidebar
+    // d3.select('.information-country-click-country')
+    //     .html(d.COUNTRY);
 
     if (arr.length > 0) {
 
@@ -1187,19 +1191,11 @@ d3.queue()
             // Data processing tasks we want to do once only
 
 
-            //////////////
-            // MAP DATA //
-            //////////////
+            ////////////////////
+            // WORLD MAP DATA //
+            ////////////////////
 
-            // process world map json data
             countries = topojson.feature(world, world.objects.countries).features;
-
-            // merge world map data with country names
-            countries = countries.filter(function(d) {
-                return countryJson.some(function(n) {
-                    if (d.id == n['country-code']) return d.name = n.name;
-                })
-            });
 
             /////////////////
             // REGION DATA //
@@ -1222,7 +1218,7 @@ d3.queue()
             countryCodeKey.forEach(function(d) {
                 d.cown = +d.cown
                 d.iso3n = +d.iso3n
-            })
+            });
 
             ////////////////////
             // CONFLICTS DATA //
@@ -1249,7 +1245,31 @@ d3.queue()
 
             });
 
-            // setting global conflicts variable to processed conflicts data
+            ////////////////////////////////////////////////////
+            // MERGING COUNTRY NAMES WITH PROCESSED CONFLICTS //
+            ////////////////////////////////////////////////////
+
+            countryJson.forEach(function(d) {
+
+                var arr = conflictsProcessed.filter(function(e) {
+                    return e.ISOCODE === Number(d['country-code']);
+                });
+                if (arr.length > 0) {
+                    d.name = arr[0].COUNTRY;
+                }
+            })
+
+
+            countries = countries.filter(function(d) {
+                return countryJson.some(function(n) {
+                    if (d.id === n['country-code']) return d.name = n.name;
+                })
+            });
+
+            ////////////////////////////////////////////
+            // GLOBAL VARIABLE FOR PROCSSED CONFLICTS //
+            ////////////////////////////////////////////
+
             conflicts = conflictsProcessed;
 
             drawPrimaryChart(conflictsProcessed);
