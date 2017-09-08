@@ -258,61 +258,6 @@ body {
     height: 50px;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* .legend-region-flex {
-    height: 140px;
-} */
-
 .legend-region-color {
     width: 11px;
     height: 140px;
@@ -326,6 +271,7 @@ body {
 }
 
 .map {
+    cursor: pointer;
     height: 200px;
     border-bottom: solid #93a1a1 2px;
 }

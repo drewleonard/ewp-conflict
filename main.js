@@ -49,13 +49,18 @@ var countries, mapW, mapH, mapG, path, projection, zoom;
 
 var formatComma = d3.format(',');
 
-var region, colorScale;
+var region, regionColorScale;
+
+var deathColorScaleDomain, deathColorScale;
 
 var regionPalette = [
     "#6c71c4", "#b58900",
     "#dc322f", "#2aa198",
     "#859900", "#268bd2"
 ];
+
+var deathPalette = ["#feb24c", "#fd8d3c", "#fc4e2a", "#e31a1c", "#bd0026", "#800026"]
+// ["#081d58", "#253494", "#225ea8", "#1d91c0", "#41b6c4", "#7fcdbb", "#feb24c", "#fd8d3c", "#fc4e2a", "#e31a1c", "#bd0026", "#800026"]
 
 var defaultPalette = ["#586e75"],
     defaultLegend = ["All events"];
@@ -407,7 +412,20 @@ function colorByRegion() {
         .transition()
         .duration(secondaryDuration)
         .style('fill', function(d) {
-            return colorScale(d.REGION);
+            return regionColorScale(d.REGION);
+        });
+
+}
+
+function colorByDeath() {
+
+    // legend settings
+
+    chartMain.selectAll('.event')
+        .transition()
+        .duration(secondaryDuration)
+        .style('fill', function(d) {
+            return deathColorScale(d.AVGFAT)
         });
 
 }
@@ -813,7 +831,7 @@ function countryClickZoom(d) {
     if (arr.length > 0) {
 
         var description = 'This country has ' + '<span class="information-country-click-emphasis">' + arr.length + '</span>' +
-            ' episode(s) of political repression included in this dataset. ' +
+            ' episode(s) of political repression since 1945. ' +
             'Episodes are highlighted to the right.'
 
         d3.selectAll('.event')
@@ -834,13 +852,13 @@ function countryClickZoom(d) {
 
     } else {
 
-        var description = 'This country has ' + '<strong>' + arr.length + '</strong>' +
-            ' episodes of political repression included in this dataset.'
+        var description = 'This country has ' + '<span class="information-country-click-emphasis">' + arr.length + '</span>' +
+            ' episodes of political repression since 1945.'
 
         d3.selectAll('.event')
             .transition()
             .duration(secondaryDuration)
-            .style('opacity', null);
+            .style('opacity', eventOpacity);
 
     }
 
@@ -1076,7 +1094,10 @@ function eventClick(d) {
 
     } catch (TypeError) {
 
-        console.log(TypeError + ': problem drawing map');
+        // reset map if country does not exist on map
+        map.transition()
+            .duration(primaryDuration)
+            .call(zoom.transform, d3.zoomIdentity);
 
     }
 
@@ -1236,10 +1257,35 @@ d3.queue()
             region = conflictsProcessed.map(function(obj) { return obj.REGION; });
             region = region.filter(function(v, i) { return region.indexOf(v) == i; });
 
-            // color scale
-            colorScale = d3.scaleOrdinal()
+            // region color scale
+            regionColorScale = d3.scaleOrdinal()
                 .domain(region)
                 .range(regionPalette);
+
+            ////////////////
+            // DEATH DATA //
+            ////////////////
+
+            deathColorScaleDomain = function() {
+
+                var tempArr = conflictsProcessed
+                    .map(function(o) { return o.AVGFAT; })
+                    .filter(Boolean)
+                    .sort(function(a, b) { return d3.ascending(a, b); });
+
+                var q1 = d3.quantile(tempArr, 0.20),
+                    q2 = d3.quantile(tempArr, 0.40),
+                    q3 = d3.quantile(tempArr, 0.60),
+                    q4 = d3.quantile(tempArr, 0.80),
+                    q5 = d3.quantile(tempArr, 1.00);
+
+                return [q1, q2, q3, q4, q5];
+
+            }
+
+            deathColorScale = d3.scaleQuantile()
+                .domain(deathColorScaleDomain())
+                .range(deathPalette);
 
             //////////////////////
             // COUNTRY CODE KEY //
