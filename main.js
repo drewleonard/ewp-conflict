@@ -1007,7 +1007,7 @@ function eventMouseOver(d) {
     // prepare text for tooltip
     var pCountry = '<p class="tooltipTextPrimary">' + d.COUNTRY + '</p>',
         pDates = '<p class="tooltipTextSecondary">' + d.STARTYEAR + " - " + d.ENDYEAR + '</p>',
-        pCasualties = '<p class="tooltipTextTertiary">' + formatComma(d.AVGFAT) + " casualties" + '</p>';
+        pDeaths = '<p class="tooltipTextTertiary">' + formatComma(d.AVGFAT) + " deaths" + '</p>';
 
     // record location for tooltip
     var top = this.getBoundingClientRect().y,
@@ -1016,7 +1016,7 @@ function eventMouseOver(d) {
     // add tooltip
     tooltip
         .style("display", "inline-block")
-        .html(pCountry + pDates + pCasualties);
+        .html(pCountry + pDates + pDeaths);
 }
 
 function eventMouseMove(d) {
