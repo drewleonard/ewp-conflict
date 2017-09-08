@@ -405,7 +405,9 @@ function colorByRegion() {
 
     // legend settings
     filledByRegion = true;
-    legendCases.region();
+    legendChange($('.legend-region'));
+
+    // legendCases.region();
 
     // set each event fill by country
     chartMain.selectAll('.event')
@@ -436,9 +438,11 @@ function removeColor() {
     filledByRegion = false;
 
     if (eventSelected === false) {
-        legendCases.default();
+        legendChange($('.legend-default'));
+        // legendCases.default();
     } else {
-        legendCases.selected();
+        legendChange($('.legend-selected'));
+        // legendCases.selected();
     }
 
 
@@ -1077,7 +1081,8 @@ function eventClick(d) {
     // legend settings
     eventSelected = true;
     if (filledByRegion === false) {
-        legendCases.selected();
+        legendChange($('.legend-selected'));
+        // legendCases.selected();
     }
 
     // record selected event
@@ -1164,9 +1169,11 @@ function interaction(conflicts) {
             eventSelected = false;
 
             if (filledByRegion === false) {
-                legendCases.default();
+                legendChange($('.legend-default'));
+                // legendCases.default();
             } else {
-                legendCases.region();
+                legendChange($('.legend-region'));
+                // legendCases.region();
             }
 
             eventRemoveHighlight();
@@ -1213,6 +1220,26 @@ function legendToggle() {
     $('.legend-wrapper').slideToggle();
 
 }
+
+function legendChange(targetDiv) {
+
+    $('.legend-wrapper').children('.legend-wrapper-child').each(function() {
+        $(this).slideUp()
+    });
+
+    targetDiv.slideDown();
+
+}
+
+function resetInformation(targetDiv) {
+
+    $('.information').children('.information-child').each(function() {
+        $(this).hide();
+    });
+
+    targetDiv.show();
+}
+
 
 /////////////////
 // NAMING DATA //
