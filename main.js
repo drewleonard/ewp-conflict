@@ -34,6 +34,20 @@
 // Resizing function still
 // defaultPalette / find way of getting css
 
+////////////////////
+// LOADING SCREEN //
+////////////////////
+
+var loadingLength = 1500;
+
+jQuery(document).ready(function($) {
+    $(window).load(function() {
+        setTimeout(function() {
+            $('.loader').fadeOut('slow', function() {});
+        }, loadingLength);
+    });
+});
+
 //////////////////////
 // GLOBAL VARIABLES //
 //////////////////////
@@ -842,8 +856,6 @@ function drawLegendDeathLabel() {
         }),
         formatDeathN = d3.format(".2s");
 
-    console.log(arr);
-
     legendDeathLabel.selectAll('.label')
         .data(arr)
         .enter()
@@ -1471,7 +1483,7 @@ d3.queue()
                 }
 
                 // assigning iso code to country
-                var key = countryCodeKey.find(o => o.cown === d.COWCCODE);
+                let key = countryCodeKey.find(o => o.cown === d.COWCCODE);
                 if (key !== undefined) {
                     d['ISOCODE'] = key.iso3n;
                 }
