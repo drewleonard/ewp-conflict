@@ -193,7 +193,8 @@ body {
 
 .legend-wrapper,
 .legend-selected,
-.legend-region {
+.legend-region,
+.legend-death {
     display: none;
     font-size: 0.75em;
 }
@@ -211,7 +212,8 @@ body {
 .refine-flex-container,
 .legend-default-flex,
 .legend-selected-flex,
-.legend-region-flex {
+.legend-region-flex,
+.legend-death-flex {
     display: flex;
     flex-direction: row;
     padding: 0.50em 0 0 0em;
@@ -235,39 +237,51 @@ body {
 }
 
 .legend-default-color {
-    width: 11px;
-    height: 30px;
+    width: 1em;
+    height: 0px;
     padding-right: 0.50em;
 }
 
 .legend-default-label {
     flex: 1 1 auto;
     fill: #586e75;
-    height: 30px;
+    height: 0px;
 }
 
 .legend-selected-color {
-    width: 11px;
-    height: 50px;
+    width: 1em;
+    height: 0px;
     padding-right: 0.50em;
 }
 
 .legend-selected-label {
     flex: 1 1 auto;
     fill: #586e75;
-    height: 50px;
+    height: 0px;
 }
 
 .legend-region-color {
-    width: 11px;
-    height: 140px;
+    width: 1em;
+    height: 0px;
     padding-right: 0.50em;
 }
 
 .legend-region-label {
     flex: 1 1 auto;
     fill: #586e75;
-    height: 140px;
+    height: 0px;
+}
+
+.legend-death-color {
+    width: 1em;
+    height: 0px;
+    padding-right: 0.50em;
+}
+
+.legend-death-label {
+    flex: 1 1 auto;
+    fill: #586e75;
+    height: 0px;
 }
 
 .map {

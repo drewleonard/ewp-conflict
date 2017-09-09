@@ -51,7 +51,7 @@ var formatComma = d3.format(',');
 
 var region, regionColorScale;
 
-var deathColorScaleDomain, deathColorScale;
+var deathColorScaleDomain, deathColorScale, deathArr;
 
 var regionPalette = [
     "#6c71c4", "#b58900",
@@ -59,8 +59,9 @@ var regionPalette = [
     "#859900", "#268bd2"
 ];
 
-var deathPalette = ["#feb24c", "#fd8d3c", "#fc4e2a", "#e31a1c", "#bd0026", "#800026"]
-// ["#081d58", "#253494", "#225ea8", "#1d91c0", "#41b6c4", "#7fcdbb", "#feb24c", "#fd8d3c", "#fc4e2a", "#e31a1c", "#bd0026", "#800026"]
+var deathPalette = ["#fd8d3c", "#fc4e2a", "#e31a1c", "#bd0026", "#800026"]
+// ["#081d58", "#253494", "#225ea8", "#1d91c0", "#41b6c4", "#7fcdbb", "#feb24c", 
+// "#fd8d3c", "#fc4e2a", "#e31a1c", "#bd0026", "#800026"]
 
 var defaultPalette = ["#586e75"],
     defaultLegend = ["All events"];
@@ -71,25 +72,8 @@ var selectedPalette = ["#268bd2", "#586e75"],
 var chartLegendText = ["Deaths"];
 
 var filledByRegion = false,
+    filledByDeath = false,
     eventSelected = false;
-
-var legendCases = {
-    default: function() {
-        $('.legend-region').slideUp();
-        $('.legend-default').slideDown();
-        $('.legend-selected').slideUp();
-    },
-    selected: function() {
-        $('.legend-region').slideUp();
-        $('.legend-default').slideUp();
-        $('.legend-selected').slideDown();
-    },
-    region: function() {
-        $('.legend-region').slideDown();
-        $('.legend-default').slideUp();
-        $('.legend-selected').slideUp();
-    }
-}
 
 /////////////////////////////////
 // SVG AND OTHER PAGE ELEMENTS //
@@ -130,6 +114,14 @@ var legendRegionColor = d3.select('.legend-region-color')
 var legendRegionLabel = d3.select('.legend-region-label')
     .append('svg')
     .attr('id', 'legendRegionLabel');
+
+var legendDeathColor = d3.select('.legend-death-color')
+    .append('svg')
+    .attr('id', 'legendDeathColor');
+
+var legendDeathLabel = d3.select('.legend-death-label')
+    .append('svg')
+    .attr('id', 'legendDeathLabel');
 
 var tooltip = d3.select('.tooltip');
 
@@ -405,9 +397,8 @@ function colorByRegion() {
 
     // legend settings
     filledByRegion = true;
+    filledByDeath = false;
     legendChange($('.legend-region'));
-
-    // legendCases.region();
 
     // set each event fill by country
     chartMain.selectAll('.event')
@@ -422,6 +413,9 @@ function colorByRegion() {
 function colorByDeath() {
 
     // legend settings
+    filledByRegion = false;
+    filledByDeath = true;
+    legendChange($('.legend-death'));
 
     chartMain.selectAll('.event')
         .transition()
@@ -436,13 +430,12 @@ function removeColor() {
 
     // legend settings
     filledByRegion = false;
+    filledByDeath = false;
 
     if (eventSelected === false) {
         legendChange($('.legend-default'));
-        // legendCases.default();
     } else {
         legendChange($('.legend-selected'));
-        // legendCases.selected();
     }
 
 
@@ -462,6 +455,12 @@ function drawLegendDefaultColor() {
     ////////////////
     // DIMENSIONS //
     ////////////////
+
+    // calculate and set height of legend
+    var legendHStep = parseInt($('.legend-default-color').css('width')),
+        legendH = (defaultPalette.length * 2) * legendHStep;
+
+    $('.legend-default-color').css('height', legendH);
 
     var w = parseInt($('.legend-default-color').css('width')),
         h = parseInt($('.legend-default-color').css('height'));
@@ -504,6 +503,12 @@ function drawLegendDefaultLabel() {
     ////////////////
     // DIMENSIONS //
     ////////////////
+
+    // calculate and set height of legend
+    var legendHStep = parseInt($('.legend-default-color').css('width')),
+        legendH = (defaultPalette.length * 2) * legendHStep;
+
+    $('.legend-default-label').css('height', legendH);
 
     var w = parseInt($('.legend').css('width')),
         h = parseInt($('.legend-default-label').css('height')),
@@ -550,6 +555,12 @@ function drawLegendSelectedColor() {
     // DIMENSIONS //
     ////////////////
 
+    // calculate and set height of legend
+    var legendHStep = parseInt($('.legend-selected-color').css('width')),
+        legendH = (selectedPalette.length * 2) * legendHStep;
+
+    $('.legend-selected-color').css('height', legendH);
+
     var w = parseInt($('.legend-selected-color').css('width')),
         h = parseInt($('.legend-selected-color').css('height'));
 
@@ -591,6 +602,12 @@ function drawLegendSelectedLabel() {
     ////////////////
     // DIMENSIONS //
     ////////////////
+
+    // calculate and set height of legend
+    var legendHStep = parseInt($('.legend-selected-color').css('width')),
+        legendH = (selectedPalette.length * 2) * legendHStep;
+
+    $('.legend-selected-label').css('height', legendH);
 
     var w = parseInt($('.legend').css('width')),
         h = parseInt($('.legend-selected-label').css('height')),
@@ -637,6 +654,12 @@ function drawLegendRegionColor() {
     // DIMENSIONS //
     ////////////////
 
+    // calculate and set height of legend
+    var legendHStep = parseInt($('.legend-region-color').css('width')),
+        legendH = (regionPalette.length * 2) * legendHStep;
+
+    $('.legend-region-color').css('height', legendH);
+
     var w = parseInt($('.legend-region-color').css('width')),
         h = parseInt($('.legend-region-color').css('height'));
 
@@ -679,6 +702,12 @@ function drawLegendRegionLabel() {
     // DIMENSIONS //
     ////////////////
 
+    // calculate and set height of legend
+    var legendHStep = parseInt($('.legend-region-color').css('width')),
+        legendH = (regionPalette.length * 2) * legendHStep;
+
+    $('.legend-region-label').css('height', legendH);
+
     var w = parseInt($('.legend').css('width')),
         h = parseInt($('.legend-region-label').css('height')),
         squareW = parseInt($('.legend-region-color').css('width'));
@@ -714,6 +743,120 @@ function drawLegendRegionLabel() {
         })
 }
 
+////////////////////////////
+// LEGEND DEATH FUNCTIONS //
+////////////////////////////
+
+function drawLegendDeathColor() {
+
+    ////////////////
+    // DIMENSIONS //
+    ////////////////
+
+    // calculate and set height of legend
+    var legendHStep = parseInt($('.legend-death-color').css('width')),
+        legendH = (deathPalette.length * 2) * legendHStep;
+
+    $('.legend-death-color').css('height', legendH);
+
+    var w = parseInt($('.legend-death-color').css('width')),
+        h = parseInt($('.legend-death-color').css('height'));
+
+    legendDeathColor
+        .attr('width', w)
+        .attr('height', h);
+
+    //////////////////////////
+    // STEP AND POSITIONING //
+    //////////////////////////
+
+    var numBoxes = deathPalette.length,
+        numSpaces = numBoxes - 1,
+        boxesH = w * (numBoxes + numSpaces),
+        step = (h - boxesH) / 2;
+
+    ////////////////////////////
+    // DRAWING LEGEND SQAURES //
+    ////////////////////////////
+
+    legendDeathColor.selectAll('.square')
+        .data(deathPalette)
+        .enter()
+        .append('rect')
+        .attr('class', 'square')
+        .attr('x', 0)
+        .attr('y', function(d, i) {
+            return step + (i * w * 2)
+        })
+        .attr('width', w)
+        .attr('height', w)
+        .attr('fill', function(d) {
+            return d;
+        });
+}
+
+function drawLegendDeathLabel() {
+
+    ////////////////
+    // DIMENSIONS //
+    ////////////////
+
+    // calculate and set height of legend
+    var legendHStep = parseInt($('.legend-death-color').css('width')),
+        legendH = (deathPalette.length * 2) * legendHStep;
+
+    $('.legend-death-label').css('height', legendH);
+
+    var w = parseInt($('.legend').css('width')),
+        h = parseInt($('.legend-death-label').css('height')),
+        squareW = parseInt($('.legend-death-color').css('width'));
+
+    legendDeathLabel
+        .attr('width', w)
+        .attr('height', h);
+
+    //////////////////////////
+    // STEP AND POSITIONING //
+    //////////////////////////
+
+    var numBoxes = deathPalette.length,
+        numSpaces = numBoxes - 1,
+        boxesH = squareW * (numBoxes + numSpaces),
+        step = (h - boxesH) / 2;
+
+    ///////////////////////////
+    // DRAWING LEGEND LABELS //
+    ///////////////////////////
+
+    var arr = deathColorScale.range().map(function(d) {
+            d = deathColorScale.invertExtent(d);
+            if (d[0] == null) d[0] = x.domain()[0];
+            if (d[1] == null) d[1] = x.domain()[1];
+            return d;
+        }),
+        formatDeathN = d3.format(".2s");
+
+    console.log(arr);
+
+    legendDeathLabel.selectAll('.label')
+        .data(arr)
+        .enter()
+        .append('text')
+        .attr('class', 'label')
+        .attr('x', 0)
+        .attr('y', function(d, i) {
+            return step + squareW + (i * squareW * 2)
+        })
+        .text(function(d, i) {
+            if (i === 0) {
+                return formatDeathN(d3.min(deathArr)) + " to " + formatDeathN(d[1]) + " deaths";
+            } else if (i === deathPalette.length - 1) {
+                return formatDeathN(d[0]) + " to " + formatDeathN(d3.max(deathArr)) + " deaths"
+            }
+            return formatDeathN(d[0]) + " to " + formatDeathN(d[1]) + " deaths";
+        })
+}
+
 function drawLegend() {
     drawLegendDefaultColor();
     drawLegendDefaultLabel();
@@ -721,6 +864,8 @@ function drawLegend() {
     drawLegendSelectedLabel();
     drawLegendRegionColor();
     drawLegendRegionLabel();
+    drawLegendDeathColor();
+    drawLegendDeathLabel();
 }
 
 //////////////////////////
@@ -1080,9 +1225,8 @@ function eventClick(d) {
 
     // legend settings
     eventSelected = true;
-    if (filledByRegion === false) {
+    if (filledByRegion === false && filledByDeath === false) {
         legendChange($('.legend-selected'));
-        // legendCases.selected();
     }
 
     // record selected event
@@ -1168,12 +1312,10 @@ function interaction(conflicts) {
             // toggling legend
             eventSelected = false;
 
-            if (filledByRegion === false) {
+            if (filledByRegion === false && filledByDeath === false) {
                 legendChange($('.legend-default'));
-                // legendCases.default();
             } else {
                 legendChange($('.legend-region'));
-                // legendCases.region();
             }
 
             eventRemoveHighlight();
@@ -1289,31 +1431,6 @@ d3.queue()
                 .domain(region)
                 .range(regionPalette);
 
-            ////////////////
-            // DEATH DATA //
-            ////////////////
-
-            deathColorScaleDomain = function() {
-
-                var tempArr = conflictsProcessed
-                    .map(function(o) { return o.AVGFAT; })
-                    .filter(Boolean)
-                    .sort(function(a, b) { return d3.ascending(a, b); });
-
-                var q1 = d3.quantile(tempArr, 0.20),
-                    q2 = d3.quantile(tempArr, 0.40),
-                    q3 = d3.quantile(tempArr, 0.60),
-                    q4 = d3.quantile(tempArr, 0.80),
-                    q5 = d3.quantile(tempArr, 1.00);
-
-                return [q1, q2, q3, q4, q5];
-
-            }
-
-            deathColorScale = d3.scaleQuantile()
-                .domain(deathColorScaleDomain())
-                .range(deathPalette);
-
             //////////////////////
             // COUNTRY CODE KEY //
             //////////////////////
@@ -1369,6 +1486,33 @@ d3.queue()
                     if (d.id === n['country-code']) return d.name = n.name;
                 })
             });
+
+            ////////////////
+            // DEATH DATA //
+            ////////////////
+
+            deathColorScaleDomain = function() {
+
+                deathArr = conflictsProcessed
+                    .map(function(o) { return o.AVGFAT; })
+                    .filter(Boolean)
+                    .sort(function(a, b) { return d3.ascending(a, b); });
+
+                var deathArrWithoutOutlier = deathArr.slice(0, -1);
+
+                var q1 = d3.quantile(deathArrWithoutOutlier, 0.20),
+                    q2 = d3.quantile(deathArrWithoutOutlier, 0.40),
+                    q3 = d3.quantile(deathArrWithoutOutlier, 0.60),
+                    q4 = d3.quantile(deathArrWithoutOutlier, 0.80),
+                    q5 = d3.quantile(deathArrWithoutOutlier, 1.00);
+
+                return [q1, q2, q3, q4, q5];
+
+            }
+
+            deathColorScale = d3.scaleQuantile()
+                .domain(deathColorScaleDomain())
+                .range(deathPalette);
 
             ////////////////////////////////////////////
             // GLOBAL VARIABLE FOR PROCSSED CONFLICTS //
