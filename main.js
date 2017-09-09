@@ -40,7 +40,7 @@
 
 if ($.browser.safari === true) {
 
-    // console.log(safari);
+    console.log(safari);
 
     // change loader
     $(".loader").css("background", "#fdf6e3")
