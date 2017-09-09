@@ -400,6 +400,9 @@ function colorByRegion() {
     chartColored = 'region';
     legendChange($('.legend-region'));
 
+    chartMain.selectAll('.event')
+        .classed('event-over-colored-on', true);
+
     // set each event fill by country
     chartMain.selectAll('.event')
         .transition()
@@ -417,6 +420,9 @@ function colorByDeath() {
     legendChange($('.legend-death'));
 
     chartMain.selectAll('.event')
+        .classed('event-over-colored-on', true);
+
+    chartMain.selectAll('.event')
         .transition()
         .duration(secondaryDuration)
         .style('fill', function(d) {
@@ -429,6 +435,9 @@ function removeColor() {
 
     // legend settings
     chartColored = false;
+
+    chartMain.selectAll('.event')
+        .classed('event-over-colored-on', false);
 
     if (eventSelected === false) {
         legendChange($('.legend-default'));
@@ -1114,6 +1123,9 @@ function eventRemoveHighlight() {
     d3.selectAll('.event')
         .classed('event-over', false);
 
+    d3.selectAll('.event')
+        .classed('event-over-colored', false);
+
     var targetDiv = $('.information-primary');
     resetInformation(targetDiv);
 
@@ -1251,9 +1263,16 @@ function eventClick(d) {
     d3.selectAll('.event')
         .classed('event-over', false);
 
+    d3.selectAll('.event')
+        .classed('event-over-colored', false);
+
     // color newly selected event
     d3.select(this)
         .classed('event-over', true);
+
+    d3.select(this)
+        .classed('event-over-colored', true)
+
 
     // change bar coloring
     eventAddHighlight(chartId);
