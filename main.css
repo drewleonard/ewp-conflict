@@ -30,6 +30,18 @@ body {
     background: #fdf6e3 url('Blocks.svg') no-repeat center center;
 }
 
+.error {
+    position: relative;
+    z-index: 700;
+    font-size: 30px;
+    color: #268bd2;
+    font-weight: bolder;
+    text-align: center;
+    background-color: #eee8d5;
+    clear: both;
+    margin: 0 auto;
+}
+
 .body {
     overflow: hidden;
 }
