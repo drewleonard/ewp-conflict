@@ -1,1 +1,3 @@
-This project is currently in beta.
+This project is currently in beta. It visualizes episodes of political repression globally since 1945. It is part of the <a href="https://www.earlywarningproject.org/">Early Warning Project</a>, an initiative to warn governments, advocacy groups, and at-risk societies of mass atrocities early.
+
+I began this project during Dartmouth's 2017 Summer Term, as a Research Assistant in the Government Department. This project is one in a series I am creating for the Early Warning Project. Please view the progress of this project in its GitHub repository, and contact me with any questions at drew.n.leonard.19@dartmouth.edu.
