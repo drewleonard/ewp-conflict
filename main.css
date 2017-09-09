@@ -187,7 +187,6 @@ body {
 .refine-button,
 .legend-button,
 .statistic-button {
-    cursor: pointer;
     font-weight: 700;
 }
 
@@ -285,7 +284,6 @@ body {
 }
 
 .map {
-    cursor: pointer;
     height: 200px;
     border-bottom: solid #93a1a1 2px;
 }
@@ -296,6 +294,7 @@ body {
 }
 
 .country {
+    cursor: pointer;
     fill: #93a1a1;
     padding: 0.25em 0 0 0;
     stroke: #fdf6e3;
