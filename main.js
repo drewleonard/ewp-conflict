@@ -73,6 +73,7 @@ var chartLegendText = ["Deaths"];
 
 var filledByRegion = false,
     filledByDeath = false,
+    chartColored = false,
     eventSelected = false;
 
 /////////////////////////////////
@@ -396,8 +397,7 @@ function orderByDate() {
 function colorByRegion() {
 
     // legend settings
-    filledByRegion = true;
-    filledByDeath = false;
+    chartColored = 'region';
     legendChange($('.legend-region'));
 
     // set each event fill by country
@@ -413,8 +413,7 @@ function colorByRegion() {
 function colorByDeath() {
 
     // legend settings
-    filledByRegion = false;
-    filledByDeath = true;
+    chartColored = 'death';
     legendChange($('.legend-death'));
 
     chartMain.selectAll('.event')
@@ -429,15 +428,13 @@ function colorByDeath() {
 function removeColor() {
 
     // legend settings
-    filledByRegion = false;
-    filledByDeath = false;
+    chartColored = false;
 
     if (eventSelected === false) {
         legendChange($('.legend-default'));
     } else {
         legendChange($('.legend-selected'));
     }
-
 
     chartMain.selectAll('.event')
         .transition()
@@ -1225,7 +1222,7 @@ function eventClick(d) {
 
     // legend settings
     eventSelected = true;
-    if (filledByRegion === false && filledByDeath === false) {
+    if (chartColored === false) {
         legendChange($('.legend-selected'));
     }
 
@@ -1309,15 +1306,7 @@ function interaction(conflicts) {
     document.getElementById('chart-main').onclick = function(e) {
         if (!e.target.hasAttribute('class', 'event')) {
 
-            // toggling legend
             eventSelected = false;
-
-            if (filledByRegion === false && filledByDeath === false) {
-                legendChange($('.legend-default'));
-            } else {
-                legendChange($('.legend-region'));
-            }
-
             eventRemoveHighlight();
         }
     }
