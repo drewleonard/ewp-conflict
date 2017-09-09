@@ -977,6 +977,10 @@ function countryClickZoom(d) {
     d3.selectAll('.event')
         .classed('event-over', false);
 
+    // remove any events with stroke
+    d3.selectAll('.event')
+        .classed('event-over-colored', false)
+
 
     // finding events of selected country
     var arr = conflicts.filter(function(e) {
