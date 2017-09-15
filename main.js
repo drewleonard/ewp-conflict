@@ -93,9 +93,11 @@ if ($.browser.safari === true) {
         "#859900", "#268bd2"
     ];
 
-    var deathPalette = ["#fd8d3c", "#fc4e2a", "#e31a1c", "#bd0026", "#800026"]
-    // ["#081d58", "#253494", "#225ea8", "#1d91c0", "#41b6c4", "#7fcdbb", "#feb24c", 
-    // "#fd8d3c", "#fc4e2a", "#e31a1c", "#bd0026", "#800026"]
+    var deathPalette = ["#9e0142", "#f46d43", "#fdae61", "#a6d96a", "#1a9850"].reverse();
+
+    // [, "#d53e4f", "#f46d43", "#fdae61", "#fee08b", "#ffffbf", "#e6f598", "#abdda4", "#66c2a5", "#3288bd", "#5e4fa2"]
+
+    // ["#a50026", "#d73027", "#f46d43", "#fdae61", "#fee08b", "#ffffbf", "#d9ef8b", , "#66bd63", , "#006837"]
 
     var defaultPalette = ["#586e75"],
         defaultLegend = ["All events"];
