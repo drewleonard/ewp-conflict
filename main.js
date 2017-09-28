@@ -3,15 +3,7 @@
 //////////
 
 // TODAY
-// add regionPalette color to selected bar
-// -- forward functionality (i.e., bar clicking behavior)
-// -- reverse functionality (i.e., using map to filter, etc.)
-// -- Check which countries don't work
-// Add data to excel file (i.e., name of event, countries involved, factions, aftermath, type of war, region)
-// Color chart radio buttons on hover
-// MAP
-// -- add automatic scaling on intialization
-// SIDE BAR ON LEFT
+// -- add automatic scaling on intialization// SIDE BAR ON LEFT
 // Legend for order of bars
 // Change radio button hard coding
 // Merging functionality (d3.v4)
@@ -30,9 +22,8 @@
 // Search for a country?
 // World View
 // Legend text
-// Use Google Closure 
+// Use Google Closure
 // Resizing function still
-// defaultPalette / find way of getting css
 
 //////////////////////
 // CHECK FOR SAFARI //
